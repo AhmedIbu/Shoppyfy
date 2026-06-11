@@ -35,6 +35,7 @@ export default function ShopPage() {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortOpen, setSortOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const category = params.get('category') ?? '';
   const sort = params.get('sort') ?? 'newest';
@@ -95,9 +96,33 @@ export default function ShopPage() {
 
   return (
     <main className="max-w-container mx-auto px-4 md:px-10 py-12">
+      {/* Mobile filter drawer backdrop */}
+      {filtersOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+          onClick={() => setFiltersOpen(false)}
+        />
+      )}
+
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Sidebar filters */}
-        <aside className="w-full md:w-64 flex-shrink-0 space-y-10">
+        {/* Sidebar filters — hidden on mobile unless drawer open */}
+        <aside
+          className={`
+            fixed top-0 left-0 h-full w-72 bg-surface z-40 overflow-y-auto px-6 py-8 space-y-10 transition-transform duration-300
+            md:static md:h-auto md:w-64 md:bg-transparent md:z-auto md:overflow-visible md:px-0 md:py-0 md:translate-x-0 md:flex-shrink-0
+            ${filtersOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
+          `}
+        >
+          {/* Close button — mobile only */}
+          <div className="flex items-center justify-between md:hidden mb-2">
+            <span className="text-label-md uppercase tracking-widest text-on-surface-variant">Filters</span>
+            <button
+              onClick={() => setFiltersOpen(false)}
+              className="material-symbols-outlined text-on-surface"
+            >
+              close
+            </button>
+          </div>
           <div>
             <h3 className="text-label-md text-on-surface-variant uppercase mb-4 tracking-widest">
               Category
@@ -205,6 +230,15 @@ export default function ShopPage() {
                 {pagination ? `Curation of ${pagination.total} artisanal pieces` : 'Loading curation…'}
               </p>
             </div>
+            <div className="flex items-center gap-3">
+            {/* Filters button — mobile only */}
+            <button
+              onClick={() => setFiltersOpen(true)}
+              className="md:hidden flex items-center gap-2 text-label-md uppercase border border-outline-variant px-4 py-2 hover:border-on-surface transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">tune</span>
+              Filters
+            </button>
             <div className="relative">
               <button
                 onClick={() => setSortOpen((o) => !o)}
@@ -231,6 +265,7 @@ export default function ShopPage() {
                   </ul>
                 </div>
               )}
+            </div>
             </div>
           </div>
 

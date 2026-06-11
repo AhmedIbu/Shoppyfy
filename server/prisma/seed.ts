@@ -28,44 +28,34 @@ async function main() {
     data: {
       email: 'admin@shoppyfy.com',
       password,
-      firstName: 'Ava',
-      lastName: 'Sterling',
+      firstName: 'Ahmed',
+      lastName: 'Ibrahim',
       role: Role.ADMIN,
     },
   });
 
-  const sellerMaison = await prisma.user.create({
+  const sellerAhmed = await prisma.user.create({
     data: {
-      email: 'maison@shoppyfy.com',
+      email: 'ibrahim.offl24@gmail.com',
       password,
-      firstName: 'Maison',
-      lastName: 'Verne',
-      role: Role.SELLER,
-    },
-  });
-
-  const sellerAtelier = await prisma.user.create({
-    data: {
-      email: 'atelier@shoppyfy.com',
-      password,
-      firstName: 'Atelier',
-      lastName: 'Noir',
+      firstName: 'Ahmed',
+      lastName: 'Ibrahim',
       role: Role.SELLER,
     },
   });
 
   const buyer = await prisma.user.create({
     data: {
-      email: 'julianna@shoppyfy.com',
+      email: 'intrepidkid1804@gmail.com',
       password,
-      firstName: 'Julianna',
-      lastName: 'Vane',
+      firstName: 'Karthik',
+      lastName: 'Doyan',
       role: Role.BUYER,
       addresses: {
         create: [
           {
             label: 'Home',
-            fullName: 'Julianna Vane',
+            fullName: 'Karthik Doyan',
             line1: '128 Greene Street',
             line2: 'Apt 4B',
             city: 'New York',
@@ -77,7 +67,7 @@ async function main() {
           },
           {
             label: 'Work',
-            fullName: 'Julianna Vane',
+            fullName: 'Karthik Doyan',
             line1: '450 W 15th Street',
             city: 'New York',
             state: 'NY',
@@ -121,7 +111,7 @@ async function main() {
       price: 348, comparePrice: 420,
       images: [img('photo-1595777457583-95e059d581b8'), img('photo-1566174053879-31528523f8ae')],
       sizes: ['XS', 'S', 'M', 'L'], colors: ['Ivory', 'Onyx'],
-      brand: 'Maison Verne', stock: 14, category: 'dresses', seller: sellerMaison.id, featured: true,
+      brand: 'Maison Verne', stock: 14, category: 'dresses', seller: sellerAhmed.id, featured: true,
     },
     {
       name: 'Sculpted Wool Overcoat',
@@ -131,7 +121,7 @@ async function main() {
       price: 590, comparePrice: 740,
       images: [img('photo-1539533397314-b1d04dd83b39'), img('photo-1544022613-e87ca75a784a')],
       sizes: ['S', 'M', 'L', 'XL'], colors: ['Camel', 'Charcoal'],
-      brand: 'Atelier Noir', stock: 8, category: 'outerwear', seller: sellerAtelier.id, featured: true,
+      brand: 'Atelier Noir', stock: 8, category: 'outerwear', seller: sellerAhmed.id, featured: true,
     },
     {
       name: 'Cashmere Crewneck — Brushed',
@@ -141,7 +131,7 @@ async function main() {
       price: 245,
       images: [img('photo-1576871337632-b9aef4c17ab9'), img('photo-1583743814966-8936f5b7be1a')],
       sizes: ['XS', 'S', 'M', 'L', 'XL'], colors: ['Oat', 'Slate', 'Forest'],
-      brand: 'Maison Verne', stock: 22, category: 'knitwear', seller: sellerMaison.id, featured: true,
+      brand: 'Maison Verne', stock: 22, category: 'knitwear', seller: sellerAhmed.id, featured: true,
     },
     {
       name: 'High-Rise Straight Jean',
@@ -151,7 +141,7 @@ async function main() {
       price: 185,
       images: [img('photo-1542272604-787c3835535d'), img('photo-1541099649105-f69ad21f3246')],
       sizes: ['24', '25', '26', '27', '28', '29', '30'], colors: ['Indigo', 'Washed Black'],
-      brand: 'Atelier Noir', stock: 30, category: 'denim', seller: sellerAtelier.id,
+      brand: 'Atelier Noir', stock: 30, category: 'denim', seller: sellerAhmed.id,
     },
     {
       name: 'The Editor Blazer',
@@ -161,7 +151,7 @@ async function main() {
       price: 425, comparePrice: 510,
       images: [img('photo-1594938298603-c8148c4dae35'), img('photo-1507679799987-c73779587ccf')],
       sizes: ['XS', 'S', 'M', 'L'], colors: ['Black', 'Pinstripe Grey'],
-      brand: 'Maison Verne', stock: 11, category: 'tailoring', seller: sellerMaison.id, featured: true,
+      brand: 'Maison Verne', stock: 11, category: 'tailoring', seller: sellerAhmed.id, featured: true,
     },
     {
       name: 'Pleated Midi Skirt',
@@ -171,7 +161,7 @@ async function main() {
       price: 168,
       images: [img('photo-1583496661160-fb5886a13d27'), img('photo-1551163943-3f6a855d1153')],
       sizes: ['XS', 'S', 'M', 'L'], colors: ['Bone', 'Navy'],
-      brand: 'Maison Verne', stock: 19, category: 'dresses', seller: sellerMaison.id,
+      brand: 'Maison Verne', stock: 19, category: 'dresses', seller: sellerAhmed.id,
     },
     {
       name: 'Cropped Leather Jacket',
@@ -181,7 +171,7 @@ async function main() {
       price: 410, comparePrice: 680,
       images: [img('photo-1551028719-00167b16eac5'), img('photo-1520975954732-35dd22299614')],
       sizes: ['S', 'M'], colors: ['Black'],
-      brand: 'Atelier Noir', condition: ProductCondition.LIKE_NEW, stock: 2, category: 'outerwear', seller: sellerAtelier.id,
+      brand: 'Atelier Noir', condition: ProductCondition.LIKE_NEW, stock: 2, category: 'outerwear', seller: sellerAhmed.id,
     },
     {
       name: 'Merino Roll-Neck',
@@ -191,7 +181,7 @@ async function main() {
       price: 128,
       images: [img('photo-1608257735467-7080d986a14a'), img('photo-1610652492500-ded49ceeb378')],
       sizes: ['XS', 'S', 'M', 'L', 'XL'], colors: ['Black', 'Ecru', 'Burgundy'],
-      brand: 'Maison Verne', stock: 27, category: 'knitwear', seller: sellerMaison.id,
+      brand: 'Maison Verne', stock: 27, category: 'knitwear', seller: sellerAhmed.id,
     },
     {
       name: 'Wide-Leg Trouser — Crepe',
@@ -201,7 +191,7 @@ async function main() {
       price: 210,
       images: [img('photo-1594633312681-425c7b97ccd1'), img('photo-1509551388413-e18d0ac5d495')],
       sizes: ['XS', 'S', 'M', 'L'], colors: ['Black', 'Ivory'],
-      brand: 'Atelier Noir', stock: 16, category: 'tailoring', seller: sellerAtelier.id,
+      brand: 'Atelier Noir', stock: 16, category: 'tailoring', seller: sellerAhmed.id,
     },
     {
       name: 'Leather Ankle Boot',
@@ -211,7 +201,7 @@ async function main() {
       price: 320, comparePrice: 395,
       images: [img('photo-1543163521-1bf539c55dd2'), img('photo-1605812860427-4024433a70fd')],
       sizes: ['36', '37', '38', '39', '40', '41'], colors: ['Black', 'Espresso'],
-      brand: 'Maison Verne', stock: 12, category: 'footwear', seller: sellerMaison.id, featured: true,
+      brand: 'Maison Verne', stock: 12, category: 'footwear', seller: sellerAhmed.id, featured: true,
     },
     {
       name: 'Silk Twill Scarf — Archive Print',
@@ -221,7 +211,7 @@ async function main() {
       price: 95,
       images: [img('photo-1584917865442-de89df76afd3'), img('photo-1601924994987-69e26d50dc26')],
       sizes: ['One Size'], colors: ['Sienna', 'Cobalt'],
-      brand: 'Maison Verne', stock: 35, category: 'accessories', seller: sellerMaison.id,
+      brand: 'Maison Verne', stock: 35, category: 'accessories', seller: sellerAhmed.id,
     },
     {
       name: 'Structured Tote — Grain Leather',
@@ -231,7 +221,7 @@ async function main() {
       price: 380,
       images: [img('photo-1590874103328-eac38a683ce7'), img('photo-1548036328-c9fa89d128fa')],
       sizes: ['One Size'], colors: ['Tan', 'Black'],
-      brand: 'Atelier Noir', stock: 9, category: 'accessories', seller: sellerAtelier.id,
+      brand: 'Atelier Noir', stock: 9, category: 'accessories', seller: sellerAhmed.id,
     },
     {
       name: 'Linen Camp Shirt',
@@ -241,7 +231,7 @@ async function main() {
       price: 145,
       images: [img('photo-1596755094514-f87e34085b2c'), img('photo-1602810318383-e386cc2a3ccf')],
       sizes: ['S', 'M', 'L', 'XL'], colors: ['White', 'Sage', 'Sand'],
-      brand: 'Atelier Noir', stock: 24, category: 'tailoring', seller: sellerAtelier.id,
+      brand: 'Atelier Noir', stock: 24, category: 'tailoring', seller: sellerAhmed.id,
     },
     {
       name: 'The Slip Dress — Bias Cut',
@@ -251,7 +241,7 @@ async function main() {
       price: 265,
       images: [img('photo-1566174053879-31528523f8ae'), img('photo-1572804013309-59a88b7e92f1')],
       sizes: ['XS', 'S', 'M', 'L'], colors: ['Champagne', 'Black'],
-      brand: 'Maison Verne', stock: 18, category: 'dresses', seller: sellerMaison.id,
+      brand: 'Maison Verne', stock: 18, category: 'dresses', seller: sellerAhmed.id,
     },
     {
       name: 'Raw-Hem Denim Jacket',
@@ -261,7 +251,7 @@ async function main() {
       price: 120, comparePrice: 195,
       images: [img('photo-1576995853123-5a10305d93c0'), img('photo-1527016021513-b09758b777bd')],
       sizes: ['S', 'M', 'L'], colors: ['Mid Indigo'],
-      brand: 'Atelier Noir', condition: ProductCondition.GOOD, stock: 3, category: 'denim', seller: sellerAtelier.id,
+      brand: 'Atelier Noir', condition: ProductCondition.GOOD, stock: 3, category: 'denim', seller: sellerAhmed.id,
     },
     {
       name: 'Pointed Slingback Heel',
@@ -271,7 +261,7 @@ async function main() {
       price: 275,
       images: [img('photo-1596703263926-eb0762ee17e4'), img('photo-1573100925118-870b8efc799d')],
       sizes: ['36', '37', '38', '39', '40'], colors: ['Noir', 'Crème'],
-      brand: 'Maison Verne', stock: 10, category: 'footwear', seller: sellerMaison.id,
+      brand: 'Maison Verne', stock: 10, category: 'footwear', seller: sellerAhmed.id,
     },
   ];
 
@@ -350,7 +340,7 @@ async function main() {
       shipping: shippingCost,
       tax,
       total: subtotal + shippingCost + tax,
-      shipFullName: 'Julianna Vane',
+      shipFullName: 'Karthik Doyan',
       shipLine1: '128 Greene Street',
       shipLine2: 'Apt 4B',
       shipCity: 'New York',
@@ -374,7 +364,7 @@ async function main() {
 
   console.log('✅ Seed complete.');
   console.log('   Demo accounts (password: Password123!):');
-  console.log('   admin@shoppyfy.com (admin) · maison@shoppyfy.com (seller) · julianna@shoppyfy.com (buyer)');
+  console.log('   admin@shoppyfy.com (admin) · ibrahim.offl24@gmail.com (seller) · intrepidkid1804@gmail.com (buyer)');
 }
 
 main()
