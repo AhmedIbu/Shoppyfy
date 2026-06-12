@@ -14,5 +14,6 @@ router.delete('/users/:id', asyncHandler(admin.deleteUser));
 router.get('/orders', asyncHandler(admin.listAllOrders));
 router.patch('/orders/:id', asyncHandler(admin.updateOrder));
 router.get('/products', asyncHandler(admin.listAllProducts));
+router.patch('/products/:id', asyncHandler(admin.updateProduct));
 
 export default router;

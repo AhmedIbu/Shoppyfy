@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/axios';
 import { Category, Product } from '../types';
 import ProductCard from '../components/ProductCard';
-import Spinner from '../components/Spinner';
 import toast from 'react-hot-toast';
 
 const HERO_IMAGE =
@@ -146,7 +145,15 @@ export default function HomePage() {
             </Link>
           </div>
           {loading ? (
-            <Spinner label="Loading the drop" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex flex-col gap-3">
+                  <div className="aspect-[3/4] skeleton" />
+                  <div className="h-4 skeleton w-3/4" />
+                  <div className="h-4 skeleton w-1/3" />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((product) => (

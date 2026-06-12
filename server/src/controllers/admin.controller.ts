@@ -178,3 +178,15 @@ export const listAllProducts = async (_req: Request, res: Response) => {
   });
   res.json({ products });
 };
+
+export const updateProduct = async (req: Request, res: Response) => {
+  const { images } = z
+    .object({ images: z.array(z.string()).min(1, 'At least one image is required') })
+    .parse(req.body);
+
+  const product = await prisma.product.update({
+    where: { id: req.params.id },
+    data: { images },
+  });
+  res.json({ product });
+};
