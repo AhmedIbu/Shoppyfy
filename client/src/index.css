@@ -85,13 +85,11 @@ body {
   width: 50%;
   height: 100%;
   overflow: hidden;
-  transition: transform 0.6s ease-in-out, border-radius 0.6s ease-in-out;
+  transition: transform 0.6s ease-in-out;
   z-index: 100;
-  border-radius: 180px 0 0 180px;
 }
 .auth-container.active .auth-overlay-container {
   transform: translateX(-100%);
-  border-radius: 0 180px 180px 0;
 }
 .auth-overlay {
   background: #16392B;
@@ -129,4 +127,32 @@ body {
 }
 .auth-container.active .auth-overlay-right {
   transform: translateX(20%);
+}
+
+/* Mobile: green panel becomes a top band that slides horizontally,
+   forms take the full width below and crossfade */
+@media (max-width: 767px) {
+  .auth-form-container {
+    width: 100%;
+    left: 0;
+    top: 30%;
+    height: 70%;
+  }
+  .auth-container.active .auth-sign-in {
+    transform: none;
+    opacity: 0;
+    z-index: 1;
+  }
+  .auth-container.active .auth-sign-up {
+    transform: none;
+  }
+  .auth-overlay-container {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 30%;
+  }
+  .auth-container.active .auth-overlay-container {
+    transform: none;
+  }
 }

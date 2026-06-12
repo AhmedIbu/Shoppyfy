@@ -89,8 +89,8 @@ export default function AuthPage() {
 
   // ── Login form JSX ────────────────────────────────────
   const loginForm = (
-    <div className="w-full h-full bg-surface-container-lowest flex flex-col justify-center px-10 py-12 overflow-y-auto">
-      <div className="max-w-xs mx-auto w-full">
+    <div className="w-full h-full bg-surface-container-lowest flex flex-col px-10 py-12 overflow-y-auto">
+      <div className="max-w-xs mx-auto my-auto w-full">
         <h2 className="font-display text-headline-sm text-on-surface font-bold mb-1">Welcome back</h2>
         <p className="text-body-sm text-on-surface-variant mb-8">Sign in to your account</p>
 
@@ -170,27 +170,14 @@ export default function AuthPage() {
         <p className="mt-6 text-center text-label-md text-on-surface-variant/60">
           Demo: julianna@shoppyfy.com · Password123!
         </p>
-
-        {/* Mobile switch link */}
-        <div className="md:hidden mt-6 text-center">
-          <p className="text-body-sm text-on-surface-variant">
-            Don&apos;t have an account?{' '}
-            <button
-              onClick={() => switchMode('register')}
-              className="text-primary font-semibold hover:underline underline-offset-4"
-            >
-              Create one
-            </button>
-          </p>
-        </div>
       </div>
     </div>
   );
 
   // ── Register form JSX ─────────────────────────────────
   const registerForm = (
-    <div className="w-full h-full bg-surface-container-lowest flex flex-col justify-center px-10 py-12 overflow-y-auto">
-      <div className="max-w-xs mx-auto w-full">
+    <div className="w-full h-full bg-surface-container-lowest flex flex-col px-10 py-12 overflow-y-auto">
+      <div className="max-w-xs mx-auto my-auto w-full">
         <h2 className="font-display text-headline-sm text-on-surface font-bold mb-1">Create Account</h2>
         <p className="text-body-sm text-on-surface-variant mb-6">Join the editorial ecosystem</p>
 
@@ -283,19 +270,6 @@ export default function AuthPage() {
             )}
           </button>
         </form>
-
-        {/* Mobile switch link */}
-        <div className="md:hidden mt-6 text-center">
-          <p className="text-body-sm text-on-surface-variant">
-            Already have an account?{' '}
-            <button
-              onClick={() => switchMode('login')}
-              className="text-primary font-semibold hover:underline underline-offset-4"
-            >
-              Sign in
-            </button>
-          </p>
-        </div>
       </div>
     </div>
   );
@@ -303,32 +277,9 @@ export default function AuthPage() {
   // ─────────────────────────────────────────────────────
   return (
     <main className="min-h-screen flex items-center justify-center bg-surface py-8 px-4">
-      {/* ── Mobile layout ── */}
-      <div className="md:hidden w-full max-w-md">
-        <h1 className="font-display text-headline-md font-bold text-center text-primary mb-8 tracking-tighter">
-          SHOPPYFY
-        </h1>
-        <div className="flex mb-6 border-b border-outline-variant">
-          {(['login', 'register'] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => switchMode(m)}
-              className={`flex-1 py-3 text-label-md uppercase tracking-widest transition-colors ${
-                mode === m
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              {m === 'login' ? 'Sign In' : 'Sign Up'}
-            </button>
-          ))}
-        </div>
-        {mode === 'login' ? loginForm : registerForm}
-      </div>
-
-      {/* ── Desktop layout with sliding animation ── */}
+      {/* Sliding panel layout — horizontal split on desktop, vertical on mobile */}
       <div
-        className={`auth-container hidden md:block w-full max-w-4xl h-[640px] shadow-2xl${
+        className={`auth-container w-full max-w-4xl h-[760px] md:h-[640px] shadow-2xl${
           mode === 'register' ? ' active' : ''
         }`}
       >
