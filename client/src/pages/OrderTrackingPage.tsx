@@ -87,7 +87,7 @@ export default function OrderTrackingPage() {
           title: 'Order processing',
           text: 'Payment confirmed. Your editorial selections are being prepared.',
           time: fmt(new Date(placedAt.getTime() + 4 * 3600 * 1000)),
-          place: 'Shoppyfy Atelier',
+          place: 'SEMMAI Atelier',
           active: activeStep === 1,
         }
       : null,
@@ -319,10 +319,10 @@ export default function OrderTrackingPage() {
                   For issues with order <strong>#{order.orderNumber}</strong>, contact our support team:
                 </p>
                 <a
-                  href={`mailto:support@shoppyfy.com?subject=Help with order ${order.orderNumber}`}
+                  href={`mailto:support@semmai.com?subject=Help with order ${order.orderNumber}`}
                   className="text-primary underline underline-offset-4 text-body-sm"
                 >
-                  support@shoppyfy.com
+                  support@semmai.com
                 </a>
                 <p className="text-body-sm text-on-surface-variant mt-4">
                   Please include your order number and a brief description of the issue. We typically respond within 24 hours.

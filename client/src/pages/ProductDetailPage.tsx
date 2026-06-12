@@ -307,14 +307,14 @@ export default function ProductDetailPage() {
             <button
               onClick={handleAddToBag}
               disabled={!inStock}
-              className="w-full bg-on-surface text-surface py-5 text-label-md uppercase tracking-[0.2em] hover:bg-primary-container transition-all active:scale-[0.98] duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full rounded bg-primary text-on-primary py-5 text-label-md uppercase tracking-[0.2em] hover:bg-primary-container transition-all active:scale-[0.98] duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {inStock ? 'Add to Bag' : 'Sold Out'}
             </button>
             <button
               onClick={handleBuyNow}
               disabled={!inStock}
-              className="w-full border border-on-surface text-on-surface py-5 text-label-md uppercase tracking-[0.2em] hover:bg-surface-container transition-all active:scale-[0.98] duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full rounded border border-primary text-primary py-5 text-label-md uppercase tracking-[0.2em] hover:bg-primary hover:text-on-primary transition-all active:scale-[0.98] duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Buy it Now
             </button>
@@ -422,7 +422,7 @@ export default function ProductDetailPage() {
                       />
                       <button
                         type="submit"
-                        className="bg-on-surface text-surface px-8 py-3 text-label-md uppercase tracking-widest hover:bg-primary transition-colors"
+                        className="rounded bg-primary text-on-primary px-8 py-3 text-label-md uppercase tracking-widest hover:bg-primary-container transition-colors"
                       >
                         Submit Review
                       </button>

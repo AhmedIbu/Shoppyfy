@@ -67,7 +67,7 @@ export default function RegisterPage() {
         <div className="absolute inset-0 bg-black/5" />
         <div className="absolute top-12 left-12">
           <h1 className="font-display text-headline-md font-bold tracking-tighter text-white drop-shadow-sm">
-            SHOPPYFY
+            SEMMAI
           </h1>
         </div>
         <div className="absolute bottom-12 left-12 right-12">
@@ -84,13 +84,13 @@ export default function RegisterPage() {
         <div className="max-w-md w-full">
           <div className="md:hidden mb-12">
             <h1 className="font-display text-headline-md font-bold tracking-tighter text-on-surface">
-              SHOPPYFY
+              SEMMAI
             </h1>
           </div>
           <div className="space-y-2 mb-10">
             <h2 className="font-display text-headline-md text-on-surface">Create Account</h2>
             <p className="text-body-md text-on-surface-variant">
-              Step into the editorial ecosystem of Shoppyfy.
+              Step into the editorial ecosystem of SEMMAI.
             </p>
           </div>
 

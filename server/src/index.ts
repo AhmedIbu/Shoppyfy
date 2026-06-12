@@ -3,7 +3,7 @@ import { env } from './config/env';
 import { prisma } from './config/prisma';
 
 const server = app.listen(env.port, () => {
-  console.log(`🛍️  Shoppyfy API running at http://localhost:${env.port}`);
+  console.log(`🛍️  SEMMAI API running at http://localhost:${env.port}`);
 });
 
 const shutdown = async () => {

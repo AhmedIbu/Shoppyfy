@@ -63,7 +63,7 @@ export default function ProductCard({ product }: { product: Product }) {
       className="product-card-hover group cursor-pointer"
       onClick={() => navigate(`/products/${product.slug}`)}
     >
-      <div className="relative overflow-hidden bg-surface-container-highest aspect-[3/4]">
+      <div className="relative overflow-hidden bg-surface-container-highest aspect-[3/4] border border-transparent group-hover:border-gold group-hover:shadow-lg transition-all duration-300">
         <img
           src={product.images[0]}
           alt={product.name}
@@ -76,17 +76,17 @@ export default function ProductCard({ product }: { product: Product }) {
         {(isNew || product.comparePrice || almostGone) && (
           <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
             {isNew && !preLoved && (
-              <span className="inter bg-primary text-on-primary text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
+              <span className="inter bg-brand-green text-white text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
                 New in
               </span>
             )}
             {product.comparePrice && (
-              <span className="inter bg-divider text-accent text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
+              <span className="inter bg-brand-red text-white text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
                 Sale
               </span>
             )}
             {almostGone && (
-              <span className="inter bg-primary text-on-primary text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
+              <span className="inter bg-brand-red text-white text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
                 Almost gone
               </span>
             )}

@@ -131,7 +131,7 @@ export const deleteMe = async (req: Request, res: Response) => {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        email: `deleted_${userId}@shoppyfy.deleted`,
+        email: `deleted_${userId}@semmai.deleted`,
         password: '',
         firstName: 'Deleted',
         lastName: 'User',

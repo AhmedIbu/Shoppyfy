@@ -3,7 +3,7 @@ import { env } from './env';
 
 const client = env.resend.apiKey ? new Resend(env.resend.apiKey) : null;
 const FROM = env.resend.from;
-const SITE = 'Shoppyfy';
+const SITE = 'SEMMAI';
 const BASE = env.clientUrl;
 
 export const sendEmail = async (to: string, subject: string, html: string): Promise<void> => {

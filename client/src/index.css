@@ -16,8 +16,8 @@ h1, h2, h3, h4 {
 /* Faint editorial grid texture over the hero image */
 .hero-grid {
   background-image:
-    repeating-linear-gradient(0deg, rgba(245, 245, 236, 0.04) 0, rgba(245, 245, 236, 0.04) 1px, transparent 1px, transparent 80px),
-    repeating-linear-gradient(90deg, rgba(245, 245, 236, 0.04) 0, rgba(245, 245, 236, 0.04) 1px, transparent 1px, transparent 80px);
+    repeating-linear-gradient(0deg, rgba(250, 248, 243, 0.04) 0, rgba(250, 248, 243, 0.04) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(90deg, rgba(250, 248, 243, 0.04) 0, rgba(250, 248, 243, 0.04) 1px, transparent 1px, transparent 80px);
 }
 
 /* Diagonal stripes for out-of-stock size tiles */
@@ -56,7 +56,7 @@ h1, h2, h3, h4 {
   100% { background-position: 400px 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #E4E4D8 0%, #F5F5EC 50%, #E4E4D8 100%);
+  background: linear-gradient(90deg, #EBE6D8 0%, #FAF8F3 50%, #EBE6D8 100%);
   background-size: 400px 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
@@ -111,7 +111,7 @@ h1, h2, h3, h4 {
   transform: translateX(-100%);
 }
 .auth-overlay {
-  background: #16392B;
+  background: #D2AC47;
   position: relative;
   left: -100%;
   height: 100%;

@@ -6,7 +6,7 @@ const columns = [
     links: [
       { label: 'New Arrivals', to: '/shop?sort=newest' },
       { label: 'Designers', to: '/shop' },
-      { label: 'Sell on Shoppyfy', to: '/register?role=seller' },
+      { label: 'Sell on SEMMAI', to: '/register?role=seller' },
       { label: 'Sustainable Fashion', to: '/shop?condition=LIKE_NEW' },
     ],
   },
@@ -34,11 +34,11 @@ export default function Footer() {
     <footer className="bg-on-surface border-t border-on-surface py-20">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-4 md:px-10 max-w-container mx-auto text-surface">
         <div className="flex flex-col gap-8">
-          <Link to="/" className="font-display text-[40px] font-bold text-surface tracking-tighter">
-            Shoppyfy
+          <Link to="/" className="font-display text-[32px] font-bold text-gold tracking-[4px] uppercase">
+            SEMMAI
           </Link>
           <p className="text-body-sm text-surface-variant">
-            The leading digital marketplace for authenticated high-fashion and editorial curation.
+            Refined Essentials — luxury fashion, thoughtfully curated.
           </p>
           <div className="flex gap-4">
             <span className="material-symbols-outlined cursor-pointer hover:text-inverse-primary transition-colors">public</span>
@@ -63,7 +63,7 @@ export default function Footer() {
       </div>
       <div className="mt-20 pt-8 border-t border-surface-variant/30 px-4 md:px-10 max-w-container mx-auto text-center">
         <p className="text-body-sm text-surface-variant">
-          © {new Date().getFullYear()} Shoppyfy. All rights reserved.
+          © {new Date().getFullYear()} SEMMAI. All rights reserved.
         </p>
       </div>
     </footer>

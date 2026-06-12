@@ -195,7 +195,7 @@ export default function CartPage() {
                     lock
                   </span>
                   <span className="text-body-sm text-on-surface-variant">
-                    Secure Checkout Powered by Stripe
+                    Secure Checkout Powered by Razorpay
                   </span>
                 </div>
               </div>

@@ -7,7 +7,7 @@ const img = (id: string, w = 800) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
 async function main() {
-  console.log('🌱 Seeding Shoppyfy…');
+  console.log('🌱 Seeding SEMMAI…');
 
   // Clean slate (order matters for FK constraints)
   await prisma.orderItem.deleteMany();

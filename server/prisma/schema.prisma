@@ -150,7 +150,9 @@ model Order {
   tax      Decimal @db.Decimal(10, 2)
   total    Decimal @db.Decimal(10, 2)
 
-  stripePaymentIntentId String? @unique
+  // Razorpay order id (column name kept from the original Stripe integration
+  // to avoid a destructive migration)
+  razorpayOrderId String? @unique @map("stripePaymentIntentId")
 
   // Shipping address snapshot (kept even if the Address record changes)
   shipFullName   String

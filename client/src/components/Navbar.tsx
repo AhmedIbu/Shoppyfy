@@ -96,9 +96,9 @@ export default function Navbar() {
           {/* Center: wordmark */}
           <Link
             to="/"
-            className="absolute left-1/2 -translate-x-1/2 font-display text-[20px] md:text-[24px] font-normal tracking-[4px] text-on-surface uppercase"
+            className="absolute left-1/2 -translate-x-1/2 font-display text-[20px] md:text-[24px] font-normal tracking-[4px] text-gold-dark uppercase"
           >
-            Shoppyfy
+            SEMMAI
           </Link>
 
           {/* Right: actions */}
@@ -107,7 +107,7 @@ export default function Navbar() {
               to={user?.role === 'SELLER' || user?.role === 'ADMIN' ? '/seller' : '/register?role=seller'}
               className="hidden lg:block text-on-surface text-label-md uppercase hover:text-primary transition-colors"
             >
-              Sell on Shoppyfy
+              Sell on SEMMAI
             </Link>
             <div className="flex items-center gap-4">
               <button
@@ -228,7 +228,7 @@ export default function Navbar() {
               onClick={closeMobile}
               className="font-display text-[28px] text-surface border-b border-surface/20 py-6 hover:text-primary-fixed transition-colors"
             >
-              Sell on Shoppyfy
+              Sell on SEMMAI
             </NavLink>
           </nav>
           <div className="px-6 py-8 mt-auto border-t border-surface/20 flex flex-col gap-4">

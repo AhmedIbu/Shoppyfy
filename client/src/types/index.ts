@@ -149,5 +149,5 @@ export interface Pagination {
 
 export const money = (value: string | number | null | undefined): string => {
   const n = Number(value ?? 0);
-  return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  return n.toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
 };

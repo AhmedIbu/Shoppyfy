@@ -26,9 +26,10 @@ export const env = {
     apiKey: process.env.CLOUDINARY_API_KEY ?? '',
     apiSecret: process.env.CLOUDINARY_API_SECRET ?? '',
   },
-  stripe: {
-    secretKey: process.env.STRIPE_SECRET_KEY ?? '',
-    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
+  razorpay: {
+    keyId: process.env.RAZORPAY_KEY_ID ?? '',
+    keySecret: process.env.RAZORPAY_KEY_SECRET ?? '',
+    webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET ?? '',
   },
   resend: {
     apiKey: process.env.RESEND_API_KEY ?? '',

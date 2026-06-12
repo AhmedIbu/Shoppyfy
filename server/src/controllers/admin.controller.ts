@@ -82,7 +82,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     await prisma.user.update({
       where: { id: target.id },
       data: {
-        email: `deleted_${target.id}@shoppyfy.deleted`,
+        email: `deleted_${target.id}@semmai.deleted`,
         password: '',
         firstName: 'Deleted',
         lastName: 'User',
@@ -146,7 +146,7 @@ export const updateOrder = async (req: Request, res: Response) => {
         if (data.status === OrderStatus.SHIPPED) {
           return sendEmail(
             user.email,
-            `Shoppyfy — Your order has shipped`,
+            `SEMMAI — Your order has shipped`,
             emails.orderShipped(
               existing.orderNumber,
               data.trackingNumber ?? existing.trackingNumber,
@@ -157,7 +157,7 @@ export const updateOrder = async (req: Request, res: Response) => {
         if (data.status === OrderStatus.DELIVERED) {
           return sendEmail(
             user.email,
-            `Shoppyfy — Your order has been delivered`,
+            `SEMMAI — Your order has been delivered`,
             emails.orderDelivered(existing.orderNumber)
           );
         }

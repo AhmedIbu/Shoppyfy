@@ -1,11 +1,11 @@
-# Shoppyfy
+# SEMMAI
 
 A full-stack editorial fashion buy/sell marketplace.
 
 **Stack:** React 18 + Vite + TypeScript + Tailwind CSS + React Router v6 + Redux Toolkit · Node.js + Express + TypeScript · PostgreSQL + Prisma · JWT (httpOnly cookies) · Multer + Cloudinary · Stripe · Docker Compose (Postgres + Redis)
 
 ```
-/Shoppyfy
+/SEMMAI
   /client    → React frontend (Vite, port 5173)
   /server    → Express API (port 5000)
   docker-compose.yml
@@ -20,7 +20,7 @@ A full-stack editorial fashion buy/sell marketplace.
 docker compose up -d
 ```
 
-Postgres is exposed on host port **5433** (to avoid clashing with a locally installed PostgreSQL on 5432) and Redis on 6379. Already running your own PostgreSQL? Skip Docker and point `DATABASE_URL` in `server/.env` at it instead, e.g. `postgresql://postgres:<password>@localhost:5432/shoppyfy`.
+Postgres is exposed on host port **5433** (to avoid clashing with a locally installed PostgreSQL on 5432) and Redis on 6379. Already running your own PostgreSQL? Skip Docker and point `DATABASE_URL` in `server/.env` at it instead, e.g. `postgresql://postgres:<password>@localhost:5432/semmai`.
 
 ### 2. Configure environment
 

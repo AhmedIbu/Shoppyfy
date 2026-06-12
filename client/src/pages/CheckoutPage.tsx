@@ -1,16 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { api, apiErrorMessage } from '../api/axios';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchCart } from '../store/cartSlice';
 import { Address, money } from '../types';
-import Spinner from '../components/Spinner';
 import { onImgError } from '../utils/imgFallback';
+import { loadRazorpay, RazorpaySuccessResponse } from '../utils/razorpay';
 
-const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
-const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 const FREE_SHIPPING_THRESHOLD = 250;
 const SHIPPING_FLAT = 12;
@@ -59,66 +55,88 @@ function StepHeading({ n, label, done, active }: { n: number; label: string; don
 
 function PaymentStep({
   orderId,
+  razorpayOrderId,
+  keyId,
   total,
   onBack,
 }: {
   orderId: string;
+  razorpayOrderId: string;
+  keyId: string;
   total: number;
   onBack: () => void;
 }) {
-  const stripe = useStripe();
-  const elements = useElements();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [submitting, setSubmitting] = useState(false);
+  const user = useAppSelector((s) => s.auth.user);
+  const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handlePay = async () => {
-    if (!stripe || !elements) return;
-    setSubmitting(true);
     setError(null);
+    setPaying(true);
 
-    const result = await stripe.confirmPayment({
-      elements,
-      redirect: 'if_required',
-      confirmParams: { return_url: `${window.location.origin}/order-confirmed/${orderId}` },
-    });
-
-    if (result.error) {
-      setError(result.error.message ?? 'Payment failed');
-      setSubmitting(false);
+    const loaded = await loadRazorpay();
+    if (!loaded) {
+      setError('Could not load the payment window. Please check your connection and try again.');
+      setPaying(false);
       return;
     }
 
-    try {
-      await api.post(`/orders/${orderId}/confirm`);
-    } catch {
-      // Webhook may already have fulfilled the order — confirmation page will show status
-    }
-    dispatch(fetchCart());
-    navigate(`/order-confirmed/${orderId}`);
+    const rzp = new window.Razorpay({
+      key: keyId,
+      order_id: razorpayOrderId,
+      name: 'SEMMAI',
+      description: 'Order payment',
+      image: '/logo.png',
+      prefill: user
+        ? { name: `${user.firstName} ${user.lastName}`, email: user.email }
+        : undefined,
+      theme: { color: '#AE8625' },
+      handler: async (response: RazorpaySuccessResponse) => {
+        try {
+          await api.post(`/orders/${orderId}/confirm`, response);
+          dispatch(fetchCart());
+          navigate(`/order-confirmed/${orderId}`);
+        } catch (err) {
+          setError(apiErrorMessage(err));
+          setPaying(false);
+        }
+      },
+      modal: { ondismiss: () => setPaying(false) },
+    });
+    rzp.on('payment.failed', (resp: unknown) => {
+      const message =
+        (resp as { error?: { description?: string } })?.error?.description ?? 'Payment failed';
+      setError(message);
+      setPaying(false);
+    });
+    rzp.open();
   };
 
   return (
     <div className="space-y-8">
       <div className="border border-outline-variant p-8 bg-surface-container-lowest">
         <div className="mb-6 flex justify-between items-center">
-          <p className="text-label-md uppercase">Payment Details</p>
-          <span className="material-symbols-outlined text-secondary">credit_card</span>
+          <p className="text-label-md uppercase">Payment Method</p>
+          <span className="material-symbols-outlined text-secondary">qr_code_2</span>
         </div>
-        <PaymentElement />
+        <p className="text-body-md text-on-surface-variant">
+          Pay securely via Razorpay — UPI (Google Pay, PhonePe, Paytm), credit / debit cards,
+          net banking, and wallets. The payment window opens when you click the button below.
+        </p>
         {error && <p className="mt-4 text-body-sm text-error">{error}</p>}
       </div>
       <div className="pt-2">
         <button
           onClick={handlePay}
-          disabled={submitting || !stripe}
+          disabled={paying}
           className="w-full bg-primary-container text-on-primary px-12 py-6 text-label-md text-lg uppercase tracking-[0.2em] hover:bg-primary transition-all duration-500 shadow-xl disabled:opacity-60"
         >
-          {submitting ? 'Processing…' : `Complete Purchase — ${money(total)}`}
+          {paying ? 'Processing…' : `Complete Purchase — ${money(total)}`}
         </button>
         <p className="text-center text-body-sm text-secondary mt-4 italic">
-          By clicking 'Complete Purchase', you agree to Shoppyfy's Terms of Service and Privacy
+          By clicking 'Complete Purchase', you agree to SEMMAI's Terms of Service and Privacy
           Policy.
         </p>
         <button
@@ -143,7 +161,8 @@ export default function CheckoutPage() {
   const [saveAddress, setSaveAddress] = useState(true);
   const [useNewAddress, setUseNewAddress] = useState(false);
 
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [razorpayOrderId, setRazorpayOrderId] = useState<string | null>(null);
+  const [keyId, setKeyId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
   const [creating, setCreating] = useState(false);
@@ -166,24 +185,7 @@ export default function CheckoutPage() {
       .catch(() => setUseNewAddress(true));
   }, []);
 
-  const stripeOptions = useMemo(
-    () =>
-      clientSecret
-        ? {
-            clientSecret,
-            appearance: {
-              variables: {
-                colorPrimary: '#3525cd',
-                borderRadius: '2px',
-                fontFamily: 'Inter, sans-serif',
-              },
-            },
-          }
-        : undefined,
-    [clientSecret]
-  );
-
-  if (items.length === 0 && !clientSecret) {
+  if (items.length === 0 && !razorpayOrderId) {
     return (
       <main className="max-w-container mx-auto px-4 md:px-10 py-24 text-center">
         <h1 className="font-display text-headline-md mb-4">Your bag is empty</h1>
@@ -203,11 +205,13 @@ export default function CheckoutPage() {
           ? { addressId: selectedAddressId }
           : { address: { ...form, line2: form.line2 || undefined, phone: form.phone || undefined }, saveAddress };
       const { data } = await api.post<{
-        clientSecret: string;
+        razorpayOrderId: string;
+        keyId: string;
         orderId: string;
         amount: number;
       }>('/checkout/create-payment-intent', payload);
-      setClientSecret(data.clientSecret);
+      setRazorpayOrderId(data.razorpayOrderId);
+      setKeyId(data.keyId);
       setOrderId(data.orderId);
       setTotal(data.amount);
       setStep(2);
@@ -328,7 +332,7 @@ export default function CheckoutPage() {
                   <button
                     onClick={continueToPayment}
                     disabled={!formValid || creating}
-                    className="bg-on-surface text-surface px-12 py-4 text-label-md uppercase tracking-widest hover:bg-primary transition-all duration-300 disabled:opacity-50"
+                    className="rounded bg-primary text-on-primary px-12 py-4 text-label-md uppercase tracking-widest hover:bg-primary-container transition-all duration-300 disabled:opacity-50"
                   >
                     {creating ? 'Preparing payment…' : 'Continue to Payment'}
                   </button>
@@ -340,18 +344,15 @@ export default function CheckoutPage() {
           {/* Step 2 — Payment */}
           <section className={step !== 2 ? 'opacity-50' : ''}>
             <StepHeading n={2} label="Payment" done={false} active={step === 2} />
-            {step === 2 &&
-              (stripePromise && clientSecret && orderId ? (
-                <Elements stripe={stripePromise} options={stripeOptions}>
-                  <PaymentStep orderId={orderId} total={total} onBack={() => setStep(1)} />
-                </Elements>
-              ) : !stripePromise ? (
-                <p className="text-body-md text-error">
-                  Stripe is not configured. Set VITE_STRIPE_PUBLISHABLE_KEY in client/.env.
-                </p>
-              ) : (
-                <Spinner label="Preparing secure payment" />
-              ))}
+            {step === 2 && razorpayOrderId && keyId && orderId && (
+              <PaymentStep
+                orderId={orderId}
+                razorpayOrderId={razorpayOrderId}
+                keyId={keyId}
+                total={total}
+                onBack={() => setStep(1)}
+              />
+            )}
           </section>
         </div>
 
@@ -404,7 +405,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between font-display text-headline-sm pt-4 border-t border-outline-variant">
                   <span>Total</span>
-                  <span className="text-primary">{money(clientSecret ? total : estTotal)}</span>
+                  <span className="text-primary">{money(razorpayOrderId ? total : estTotal)}</span>
                 </div>
               </div>
             </div>

@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
     <div className="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col">
       <header className="w-full px-4 md:px-10 h-20 flex justify-between items-center max-w-container mx-auto">
         <div className="font-display text-headline-md font-bold tracking-tighter text-on-surface">
-          SHOPPYFY
+          SEMMAI
         </div>
         <Link
           to="/login"

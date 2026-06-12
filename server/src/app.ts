@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { env } from './config/env';
 import { notFound, errorHandler } from './middleware/error';
-import { stripeWebhook } from './controllers/checkout.controller';
+import { razorpayWebhook } from './controllers/checkout.controller';
 import { asyncHandler } from './utils/asyncHandler';
 
 import authRoutes from './routes/auth.routes';
@@ -25,13 +25,13 @@ app.use(cors({ origin: env.clientUrl, credentials: true }));
 app.use(cookieParser());
 if (!env.isProd) app.use(morgan('dev'));
 
-// Stripe webhook needs the raw body for signature verification — mount before express.json()
-app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyncHandler(stripeWebhook));
+// Razorpay webhook needs the raw body for signature verification — mount before express.json()
+app.post('/api/webhooks/razorpay', express.raw({ type: 'application/json' }), asyncHandler(razorpayWebhook));
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'shoppyfy-api' }));
+app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'semmai-api' }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);

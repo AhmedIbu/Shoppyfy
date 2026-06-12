@@ -56,7 +56,7 @@ export default function LoginPage() {
         <div className="max-w-md mx-auto w-full">
           <header className="mb-12">
             <h1 className="font-display text-headline-md font-bold tracking-tighter text-on-surface mb-8">
-              SHOPPYFY
+              SEMMAI
             </h1>
             <h2 className="font-display text-headline-sm text-on-surface mb-2">Welcome back</h2>
             <p className="text-body-md text-on-surface-variant">

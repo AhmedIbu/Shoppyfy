@@ -1,9 +1,9 @@
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { OrderStatus } from '@prisma/client';
-import Stripe from 'stripe';
 import { prisma } from '../config/prisma';
-import { stripe } from '../config/stripe';
+import { razorpay } from '../config/razorpay';
 import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
 import { sendEmail, emails } from '../config/resend';
@@ -109,20 +109,22 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
     include: { items: true },
   });
 
-  const paymentIntent = await stripe.paymentIntents.create({
+  // Razorpay amounts are in paise (₹1 = 100 paise)
+  const rzpOrder = await razorpay.orders.create({
     amount: Math.round(total * 100),
-    currency: 'usd',
-    automatic_payment_methods: { enabled: true },
-    metadata: { orderId: order.id, orderNumber: order.orderNumber, userId },
+    currency: 'INR',
+    receipt: order.orderNumber,
+    notes: { orderId: order.id, orderNumber: order.orderNumber, userId },
   });
 
   await prisma.order.update({
     where: { id: order.id },
-    data: { stripePaymentIntentId: paymentIntent.id },
+    data: { razorpayOrderId: rzpOrder.id },
   });
 
   res.status(201).json({
-    clientSecret: paymentIntent.client_secret,
+    razorpayOrderId: rzpOrder.id,
+    keyId: env.razorpay.keyId,
     orderId: order.id,
     orderNumber: order.orderNumber,
     amount: total,
@@ -161,13 +163,13 @@ const fulfillOrder = async (orderId: string) => {
       const itemLines = order.items
         .map(
           (i) =>
-            `<div class="item">${i.productName} × ${i.quantity} — $${Number(i.price).toFixed(2)}</div>`
+            `<div class="item">${i.productName} × ${i.quantity} — ₹${Number(i.price).toFixed(2)}</div>`
         )
         .join('');
       return sendEmail(
         user.email,
-        `Shoppyfy — Order confirmed #${order.orderNumber}`,
-        emails.orderConfirmed(order.orderNumber, itemLines, `$${Number(order.total).toFixed(2)}`)
+        `SEMMAI — Order confirmed #${order.orderNumber}`,
+        emails.orderConfirmed(order.orderNumber, itemLines, `₹${Number(order.total).toFixed(2)}`)
       );
     })
     .catch((err) => console.error('[email] order confirmed:', err));
@@ -175,43 +177,63 @@ const fulfillOrder = async (orderId: string) => {
   return fulfilled;
 };
 
+const confirmSchema = z.object({
+  razorpay_payment_id: z.string().min(1),
+  razorpay_order_id: z.string().min(1),
+  razorpay_signature: z.string().min(1),
+});
+
 export const confirmOrder = async (req: Request, res: Response) => {
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = confirmSchema.parse(
+    req.body
+  );
+
   const order = await prisma.order.findUnique({ where: { id: req.params.id } });
   if (!order || order.userId !== req.user!.userId) throw ApiError.notFound('Order not found');
-  if (!order.stripePaymentIntentId) throw ApiError.badRequest('Order has no payment intent');
+  if (!order.razorpayOrderId) throw ApiError.badRequest('Order has no payment attached');
+  if (order.razorpayOrderId !== razorpay_order_id) {
+    throw ApiError.badRequest('Payment does not match this order');
+  }
 
-  const intent = await stripe.paymentIntents.retrieve(order.stripePaymentIntentId);
-  if (intent.status !== 'succeeded') {
-    throw ApiError.badRequest(`Payment not completed (status: ${intent.status})`);
+  // Verify the payment signature: HMAC-SHA256(order_id|payment_id, key_secret)
+  const expected = crypto
+    .createHmac('sha256', env.razorpay.keySecret)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest('hex');
+  if (expected !== razorpay_signature) {
+    throw ApiError.badRequest('Invalid payment signature');
   }
 
   const fulfilled = await fulfillOrder(order.id);
   res.json({ order: fulfilled });
 };
 
-export const stripeWebhook = async (req: Request, res: Response) => {
-  const signature = req.headers['stripe-signature'];
-  let event: Stripe.Event;
-
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      signature as string,
-      env.stripe.webhookSecret
-    );
-  } catch (err) {
-    return res.status(400).send(`Webhook signature verification failed: ${(err as Error).message}`);
+export const razorpayWebhook = async (req: Request, res: Response) => {
+  const signature = req.headers['x-razorpay-signature'];
+  if (!env.razorpay.webhookSecret) {
+    return res.status(400).send('Webhook secret not configured');
+  }
+  if (typeof signature !== 'string') {
+    return res.status(400).send('Missing webhook signature');
   }
 
-  if (event.type === 'payment_intent.succeeded') {
-    const intent = event.data.object as Stripe.PaymentIntent;
-    const orderId = intent.metadata?.orderId;
+  const expected = crypto
+    .createHmac('sha256', env.razorpay.webhookSecret)
+    .update(req.body)
+    .digest('hex');
+  if (expected !== signature) {
+    return res.status(400).send('Webhook signature verification failed');
+  }
+
+  const event = JSON.parse(req.body.toString());
+
+  if (event.event === 'payment.captured') {
+    const orderId = event.payload?.payment?.entity?.notes?.orderId;
     if (orderId) await fulfillOrder(orderId);
   }
 
-  if (event.type === 'payment_intent.payment_failed') {
-    const intent = event.data.object as Stripe.PaymentIntent;
-    const orderId = intent.metadata?.orderId;
+  if (event.event === 'payment.failed') {
+    const orderId = event.payload?.payment?.entity?.notes?.orderId;
     if (orderId) {
       await prisma.order.updateMany({
         where: { id: orderId, status: OrderStatus.PENDING },

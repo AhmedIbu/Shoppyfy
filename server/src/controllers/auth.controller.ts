@@ -135,7 +135,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const resetLink = `${env.clientUrl}/reset-password?token=${resetToken}`;
     console.log(`🔑 Password reset link: ${resetLink}`);
-    await sendEmail(user.email, 'Shoppyfy — Reset your password', emails.passwordReset(resetLink));
+    await sendEmail(user.email, 'SEMMAI — Reset your password', emails.passwordReset(resetLink));
   }
 
   res.json({ message: 'If an account exists for that email, a reset link has been sent.' });
