@@ -38,6 +38,13 @@ export default {
         'on-error': '#ffffff',
         'error-container': '#ffdad6',
         'on-error-container': '#93000a',
+        // accent: ONLY for sale prices, "Almost gone" badge text, low-stock warnings
+        // Never use accent for buttons, links, or decorative elements
+        accent: '#8B6914',
+        'accent-muted': '#F5EDD6',
+        muted: '#7a7a6e',
+        divider: '#E4E3D8',
+        faded: '#aaa8a0',
       },
       borderRadius: {
         DEFAULT: '0.125rem',
@@ -54,6 +61,9 @@ export default {
         body: ['Inter', 'sans-serif'],
       },
       fontSize: {
+        display: ['clamp(42px, 6vw, 68px)', { lineHeight: '1', letterSpacing: '-0.01em' }],
+        'headline-lg': ['clamp(26px, 4vw, 40px)', { lineHeight: '1.1' }],
+        'label-sm': ['10px', { lineHeight: '1', letterSpacing: '2.5px' }],
         'display-lg': ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '700' }],
         'display-lg-mobile': ['36px', { lineHeight: '44px', fontWeight: '700' }],
         'headline-md': ['32px', { lineHeight: '40px', fontWeight: '600' }],

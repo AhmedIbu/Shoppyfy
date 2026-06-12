@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { clearAuthError, login, register } from '../store/authSlice';
+import { onImgError } from '../utils/imgFallback';
 
 const LOGIN_MODEL =
   'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=900&q=80';
@@ -297,6 +298,7 @@ export default function AuthPage() {
               <img
                 src={REGISTER_MODEL}
                 alt="Fashion editorial"
+                onError={onImgError}
                 className="absolute inset-0 w-full h-full object-cover opacity-50"
               />
               <div className="relative z-10 flex flex-col items-center text-center px-10">
@@ -320,6 +322,7 @@ export default function AuthPage() {
               <img
                 src={LOGIN_MODEL}
                 alt="Fashion editorial"
+                onError={onImgError}
                 className="absolute inset-0 w-full h-full object-cover opacity-50"
               />
               <div className="relative z-10 flex flex-col items-center text-center px-10">

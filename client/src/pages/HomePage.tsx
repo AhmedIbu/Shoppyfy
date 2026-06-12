@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/axios';
 import { Category, Product } from '../types';
 import ProductCard from '../components/ProductCard';
+import SectionDivider from '../components/SectionDivider';
+import { onImgError } from '../utils/imgFallback';
 import toast from 'react-hot-toast';
 
 const HERO_IMAGE =
@@ -41,28 +43,37 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[640px] md:h-[870px] w-full overflow-hidden bg-on-surface">
+      <section className="relative h-[640px] md:h-[870px] w-full overflow-hidden bg-primary">
         <div className="absolute inset-0">
           <img
             src={HERO_IMAGE}
             alt="Editorial fashion"
-            className="w-full h-full object-cover opacity-80"
+            onError={onImgError}
+            className="w-full h-full object-cover"
           />
+          <div className="absolute inset-0 bg-primary/60" />
+          <div className="absolute inset-0 hero-grid" />
         </div>
-        <div className="relative z-10 h-full max-w-container mx-auto px-4 md:px-10 flex flex-col justify-center items-start text-surface">
-          <h1 className="font-display font-bold text-display-lg-mobile md:text-[80px] leading-[1.1] mb-8 max-w-2xl">
-            Curation <br /> Without <br /> Compromise.
+        <div className="relative z-10 h-full max-w-container mx-auto px-4 md:px-10 flex flex-col justify-center items-start text-on-primary">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-px bg-on-primary/40" />
+            <span className="inter text-[10px] tracking-[3px] uppercase text-on-primary/65">
+              Summer 2025 Collection
+            </span>
+          </div>
+          <h1 className="font-display font-semibold text-display mb-8 max-w-2xl">
+            Dressed for <br /> <em>every chapter.</em>
           </h1>
-          <div className="flex flex-col sm:flex-row gap-6">
+          <div className="flex gap-3">
             <button
               onClick={() => navigate('/shop?sort=newest')}
-              className="bg-surface text-on-surface px-10 py-5 text-label-md uppercase tracking-widest hover:bg-primary-container hover:text-surface transition-all duration-300"
+              className="inter bg-primary text-on-primary py-3 px-7 text-[10px] tracking-[2px] uppercase font-medium rounded-none hover:bg-primary-container transition-colors duration-300"
             >
               Shop New Arrivals
             </button>
             <button
               onClick={() => navigate('/register?role=seller')}
-              className="border border-surface text-surface px-10 py-5 text-label-md uppercase tracking-widest hover:bg-surface hover:text-on-surface transition-all duration-300"
+              className="inter bg-transparent border border-on-primary/35 text-on-primary py-3 px-7 text-[10px] tracking-[2px] uppercase font-medium rounded-none hover:bg-on-primary/10 transition-colors duration-300"
             >
               Start Selling
             </button>
@@ -87,16 +98,11 @@ export default function HomePage() {
 
       {/* Curated categories — bento grid */}
       <section className="py-24 max-w-container mx-auto px-4 md:px-10">
-        <div className="flex justify-between items-end mb-12">
-          <div>
-            <span className="text-label-md text-primary uppercase tracking-widest mb-2 block">
-              Departments
-            </span>
-            <h2 className="font-display text-headline-md">Curated Categories</h2>
-          </div>
+        <SectionDivider label="Curated Categories" />
+        <div className="flex justify-end mb-8">
           <Link
             to="/shop"
-            className="text-label-md uppercase underline underline-offset-8 hover:text-primary transition-colors"
+            className="inter text-[10px] tracking-[2px] uppercase text-muted hover:text-primary transition-colors duration-300"
           >
             View All Departments
           </Link>
@@ -112,6 +118,7 @@ export default function HomePage() {
                 <img
                   src={category.imageUrl}
                   alt={category.name}
+                  onError={onImgError}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               )}
@@ -129,19 +136,13 @@ export default function HomePage() {
       {/* Trending */}
       <section className="py-24 bg-surface-container-low overflow-hidden">
         <div className="max-w-container mx-auto px-4 md:px-10">
-          <div className="flex justify-between items-end mb-12">
-            <div>
-              <span className="text-label-md text-primary uppercase tracking-widest mb-2 block">
-                Weekly Drop
-              </span>
-              <h2 className="font-display text-headline-md">Trending Now</h2>
-            </div>
+          <SectionDivider label="Trending Now" />
+          <div className="flex justify-end mb-8">
             <Link
               to="/shop"
-              className="hidden sm:flex w-12 h-12 border border-outline items-center justify-center hover:bg-on-surface hover:text-surface transition-all"
-              aria-label="View all products"
+              className="inter text-[10px] tracking-[2px] uppercase text-muted hover:text-primary transition-colors duration-300"
             >
-              <span className="material-symbols-outlined">arrow_forward</span>
+              View All
             </Link>
           </div>
           {loading ? (

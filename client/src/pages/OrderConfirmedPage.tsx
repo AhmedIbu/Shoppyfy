@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/axios';
 import { Order, money } from '../types';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 const formatDate = (value: string | null) =>
   value
@@ -102,7 +103,7 @@ export default function OrderConfirmedPage() {
                 <div key={item.id} className="p-8 flex gap-6 items-center">
                   <div className="w-24 h-32 bg-surface-variant flex-shrink-0 overflow-hidden">
                     {item.imageUrl && (
-                      <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
+                      <img src={item.imageUrl} alt={item.productName} onError={onImgError} className="w-full h-full object-cover" />
                     )}
                   </div>
                   <div className="flex-grow">

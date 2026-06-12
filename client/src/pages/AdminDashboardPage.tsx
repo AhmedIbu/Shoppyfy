@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api, apiErrorMessage } from '../api/axios';
 import { Order, OrderStatus, money } from '../types';
+import { onImgError } from '../utils/imgFallback';
 
 interface AdminStats {
   userCount: number;
@@ -338,10 +339,7 @@ export default function AdminDashboardPage() {
                     src={p.images[0]}
                     alt={p.name}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        'https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=400&q=60';
-                    }}
+                    onError={onImgError}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-on-surface-variant/40">
@@ -416,10 +414,7 @@ export default function AdminDashboardPage() {
                         src={url}
                         alt={`Image ${idx + 1}`}
                         className="w-16 h-16 object-cover flex-shrink-0 bg-surface-container"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=100&q=60';
-                        }}
+                        onError={onImgError}
                       />
                       <span className="flex-1 text-body-sm text-on-surface-variant truncate min-w-0">
                         {url}

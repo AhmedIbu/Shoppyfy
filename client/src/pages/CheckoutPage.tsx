@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchCart } from '../store/cartSlice';
 import { Address, money } from '../types';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
@@ -366,6 +367,7 @@ export default function CheckoutPage() {
                       <img
                         src={item.product.images[0]}
                         alt={item.product.name}
+                        onError={onImgError}
                         className="w-full h-full object-cover"
                       />
                     </div>

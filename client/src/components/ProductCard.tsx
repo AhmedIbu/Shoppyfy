@@ -5,6 +5,7 @@ import { Product, money } from '../types';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { addToCart } from '../store/cartSlice';
 import { toggleWishlist, selectIsWishlisted } from '../store/wishlistSlice';
+import { onImgError } from '../utils/imgFallback';
 
 const NEW_WINDOW_DAYS = 30;
 
@@ -55,6 +56,8 @@ export default function ProductCard({ product }: { product: Product }) {
     dispatch(toggleWishlist(product.id));
   };
 
+  const almostGone = product.stock > 0 && product.stock <= 3;
+
   return (
     <div
       className="product-card-hover group cursor-pointer"
@@ -64,66 +67,76 @@ export default function ProductCard({ product }: { product: Product }) {
         <img
           src={product.images[0]}
           alt={product.name}
+          onError={onImgError}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
-        {(isNew || preLoved || product.comparePrice) && (
-          <div className="absolute top-4 left-4 flex flex-col gap-2">
+
+        {/* Status badge */}
+        {(isNew || product.comparePrice || almostGone) && (
+          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
             {isNew && !preLoved && (
-              <span className="bg-on-surface text-surface text-[10px] uppercase font-bold px-3 py-1 tracking-widest">
-                New Arrival
-              </span>
-            )}
-            {preLoved && (
-              <span className="bg-primary text-on-primary text-[10px] uppercase font-bold px-3 py-1 tracking-widest">
-                Pre-Loved
+              <span className="inter bg-primary text-on-primary text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
+                New in
               </span>
             )}
             {product.comparePrice && (
-              <span className="bg-error text-on-error text-[10px] uppercase font-bold px-3 py-1 tracking-widest">
+              <span className="inter bg-divider text-accent text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
                 Sale
+              </span>
+            )}
+            {almostGone && (
+              <span className="inter bg-primary text-on-primary text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-none">
+                Almost gone
               </span>
             )}
           </div>
         )}
+
+        {/* Wishlist heart */}
+        <button
+          onClick={handleWishlist}
+          aria-label="Toggle wishlist"
+          className={`material-symbols-outlined absolute top-2.5 right-2.5 text-[18px] transition-colors duration-300 ${
+            wishlisted ? 'filled text-on-primary' : 'text-on-primary/80 hover:text-on-primary'
+          }`}
+        >
+          favorite
+        </button>
+
+        {/* Hover overlay with quick add */}
         {product.stock > 0 ? (
-          <div className="quick-add absolute bottom-0 left-0 right-0 p-4">
-            <button
-              onClick={handleQuickAdd}
-              disabled={adding}
-              className="w-full bg-on-surface text-surface py-3 text-label-md uppercase hover:bg-primary transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-            >
+          <button
+            onClick={handleQuickAdd}
+            disabled={adding}
+            className="absolute inset-0 bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center disabled:cursor-not-allowed"
+          >
+            <span className="inter text-[10px] tracking-[2px] uppercase text-on-primary border-b border-on-primary/80 pb-0.5">
               {adding ? 'Adding…' : 'Quick Add'}
-            </button>
-          </div>
+            </span>
+          </button>
         ) : (
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-surface/80 text-center text-label-md uppercase text-on-surface-variant">
-            Sold Out
+          <div className="absolute inset-0 bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <span className="inter text-[10px] tracking-[2px] uppercase text-on-primary/80">
+              Sold Out
+            </span>
           </div>
         )}
       </div>
-      <div className="mt-6">
-        <div className="flex justify-between items-start mb-1 gap-2">
-          <h3 className="font-display text-[20px] font-semibold leading-7 text-on-surface">
-            {product.name}
-          </h3>
-          <button
-            onClick={handleWishlist}
-            aria-label="Toggle wishlist"
-            className={`material-symbols-outlined transition-colors ${
-              wishlisted ? 'filled text-primary' : 'text-on-surface-variant hover:text-primary'
-            }`}
-          >
-            favorite
-          </button>
-        </div>
+
+      <div className="mt-5">
         {product.brand && (
-          <p className="text-label-md uppercase text-on-surface-variant mb-1">{product.brand}</p>
+          <p className="inter text-[10px] tracking-[1px] uppercase text-muted mb-1">
+            {product.brand}
+          </p>
         )}
-        <p className="text-body-md text-on-surface-variant">
-          {money(product.price)}
+        <h3 className="font-display text-[20px] font-semibold leading-7 text-on-surface mb-1">
+          {product.name}
+        </h3>
+        <p className="inter">
+          <span className="font-medium text-[14px] text-primary">{money(product.price)}</span>
           {product.comparePrice && (
-            <span className="ml-2 line-through text-on-surface-variant/60">
+            <span className="text-[12px] text-accent line-through ml-1.5">
               {money(product.comparePrice)}
             </span>
           )}

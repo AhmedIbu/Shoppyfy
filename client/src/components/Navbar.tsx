@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/authSlice';
 import { resetCart } from '../store/cartSlice';
@@ -14,6 +14,7 @@ const navLinks = [
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
   const itemCount = useAppSelector((s) => s.cart.itemCount);
@@ -22,8 +23,10 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const isLinkActive = (to: string) => location.pathname + location.search === to;
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
+    const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -55,35 +58,51 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Announcement bar */}
+      <div className="bg-primary py-1.5 px-4 text-center">
+        <p className="inter text-[10px] tracking-[1.5px] uppercase text-on-primary/65">
+          Free shipping on orders above ₹999
+          <span className="hidden sm:inline"> · Easy 7-day returns</span>
+          <span className="hidden md:inline"> · New drops every Thursday</span>
+        </p>
+      </div>
+
       <nav
-        className={`bg-surface sticky top-0 z-50 border-b border-outline-variant transition-all ${
-          scrolled ? 'shadow-lg bg-surface/95 backdrop-blur-md' : ''
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? 'bg-surface border-b border-divider'
+            : 'bg-transparent border-b border-transparent'
         }`}
       >
-        <div className="flex justify-between items-center w-full px-4 md:px-10 max-w-container mx-auto h-20">
-          {/* Left: logo + desktop nav */}
-          <div className="flex items-center gap-12">
-            <Link
-              to="/"
-              className="font-display text-[32px] md:text-[40px] font-bold tracking-tighter text-on-surface"
-            >
-              Shoppyfy
-            </Link>
-            <div className="hidden md:flex gap-8">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.label}
-                  to={link.to}
-                  className="text-on-surface text-label-md uppercase pb-1 hover:text-primary transition-colors duration-200"
-                >
-                  {link.label}
-                </NavLink>
-              ))}
-            </div>
+        <div className="relative flex justify-between items-center w-full px-4 md:px-10 max-w-container mx-auto h-20">
+          {/* Left: desktop nav links */}
+          <div className="hidden md:flex gap-8 flex-1">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.label}
+                to={link.to}
+                className={`text-label-md uppercase pb-0.5 transition-colors duration-300 ${
+                  isLinkActive(link.to)
+                    ? 'text-on-surface border-b-[1.5px] border-primary'
+                    : 'text-muted border-b-[1.5px] border-transparent hover:text-primary'
+                }`}
+              >
+                {link.label}
+              </NavLink>
+            ))}
           </div>
+          <div className="md:hidden flex-1" />
+
+          {/* Center: wordmark */}
+          <Link
+            to="/"
+            className="absolute left-1/2 -translate-x-1/2 font-display text-[20px] md:text-[24px] font-normal tracking-[4px] text-on-surface uppercase"
+          >
+            Shoppyfy
+          </Link>
 
           {/* Right: actions */}
-          <div className="flex items-center gap-3 md:gap-6">
+          <div className="flex items-center justify-end gap-3 md:gap-6 flex-1">
             <Link
               to={user?.role === 'SELLER' || user?.role === 'ADMIN' ? '/seller' : '/register?role=seller'}
               className="hidden lg:block text-on-surface text-label-md uppercase hover:text-primary transition-colors"
@@ -112,7 +131,7 @@ export default function Navbar() {
               >
                 shopping_bag
                 {itemCount > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-primary text-on-primary text-[10px] font-body font-bold rounded-pill min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  <span className="absolute top-[-5px] right-[-6px] bg-surface text-primary text-[9px] inter font-medium rounded-full w-[14px] h-[14px] flex items-center justify-center border border-primary/20">
                     {itemCount}
                   </span>
                 )}

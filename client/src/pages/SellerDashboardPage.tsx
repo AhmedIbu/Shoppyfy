@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api, apiErrorMessage } from '../api/axios';
 import { Category, Order, Product, money } from '../types';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 interface SellerStats {
   productCount: number;
@@ -347,7 +348,7 @@ export default function SellerDashboardPage() {
                     <td className="py-4 pr-4">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-16 bg-surface-container overflow-hidden flex-shrink-0">
-                          <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
+                          <img src={p.images[0]} alt={p.name} onError={onImgError} className="w-full h-full object-cover" />
                         </div>
                         <div>
                           <Link to={`/products/${p.slug}`} className="font-semibold hover:text-primary">
@@ -437,7 +438,7 @@ export default function SellerDashboardPage() {
                   <div key={item.id} className="py-3 flex justify-between items-center">
                     <div className="flex items-center gap-4">
                       {item.imageUrl && (
-                        <img src={item.imageUrl} alt={item.productName} className="w-10 h-14 object-cover" />
+                        <img src={item.imageUrl} alt={item.productName} onError={onImgError} className="w-10 h-14 object-cover" />
                       )}
                       <div>
                         <p className="font-semibold text-body-sm">{item.productName}</p>

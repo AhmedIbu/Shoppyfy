@@ -4,6 +4,7 @@ import { api } from '../api/axios';
 import { Category, Pagination, Product } from '../types';
 import ProductCard from '../components/ProductCard';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 const SORTS = [
   { value: 'newest', label: 'Newest' },
@@ -268,6 +269,7 @@ export default function SearchPage() {
                 <img
                   src={p.images[0]}
                   alt={p.name}
+                  onError={onImgError}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>

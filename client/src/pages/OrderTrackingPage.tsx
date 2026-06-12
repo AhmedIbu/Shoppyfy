@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/axios';
 import { Order, money } from '../types';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 const STEPS = [
   { key: 'placed', label: 'Order Placed', icon: 'receipt_long' },
@@ -229,7 +230,7 @@ export default function OrderTrackingPage() {
                 <div key={item.id} className="flex gap-4 items-center">
                   <div className="w-16 h-20 bg-surface-container-low shrink-0 overflow-hidden">
                     {item.imageUrl && (
-                      <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
+                      <img src={item.imageUrl} alt={item.productName} onError={onImgError} className="w-full h-full object-cover" />
                     )}
                   </div>
                   <div className="flex-1">

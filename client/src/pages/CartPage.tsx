@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { removeCartItem, updateCartItem } from '../store/cartSlice';
 import { money } from '../types';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 const FREE_SHIPPING_THRESHOLD = 250;
 const SHIPPING_FLAT = 12;
@@ -72,6 +73,7 @@ export default function CartPage() {
                   <img
                     src={item.product.images[0]}
                     alt={item.product.name}
+                    onError={onImgError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </Link>

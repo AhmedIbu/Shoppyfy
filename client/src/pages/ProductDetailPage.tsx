@@ -7,6 +7,7 @@ import { addToCart } from '../store/cartSlice';
 import { toggleWishlist, selectIsWishlisted } from '../store/wishlistSlice';
 import ProductCard from '../components/ProductCard';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 type Tab = 'details' | 'reviews' | 'shipping';
 
@@ -45,6 +46,7 @@ export default function ProductDetailPage() {
   const [imageIndex, setImageIndex] = useState(0);
   const [size, setSize] = useState<string | null>(null);
   const [color, setColor] = useState<string | null>(null);
+  const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<Tab>('details');
   const [feedback, setFeedback] = useState<string | null>(null);
 
@@ -63,6 +65,7 @@ export default function ProductDetailPage() {
         setImageIndex(0);
         setSize(res.data.product.sizes[0] ?? null);
         setColor(res.data.product.colors[0] ?? null);
+        setQty(1);
       })
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
@@ -96,7 +99,7 @@ export default function ProductDetailPage() {
     setFeedback(null);
     try {
       await dispatch(
-        addToCart({ productId: product.id, quantity: 1, size: size ?? undefined, color: color ?? undefined })
+        addToCart({ productId: product.id, quantity: qty, size: size ?? undefined, color: color ?? undefined })
       ).unwrap();
       setFeedback('Added to your bag.');
     } catch (err) {
@@ -108,7 +111,7 @@ export default function ProductDetailPage() {
     if (!requireAuth()) return;
     try {
       await dispatch(
-        addToCart({ productId: product.id, quantity: 1, size: size ?? undefined, color: color ?? undefined })
+        addToCart({ productId: product.id, quantity: qty, size: size ?? undefined, color: color ?? undefined })
       ).unwrap();
       navigate('/checkout');
     } catch (err) {
@@ -153,7 +156,7 @@ export default function ProductDetailPage() {
                     : 'border border-outline-variant hover:border-primary'
                 }`}
               >
-                <img src={image} alt={`${product.name} view ${i + 1}`} className="w-full h-full object-cover" />
+                <img src={image} alt={`${product.name} view ${i + 1}`} onError={onImgError} className="w-full h-full object-cover" />
               </button>
             ))}
           </div>
@@ -161,6 +164,7 @@ export default function ProductDetailPage() {
             <img
               src={product.images[imageIndex]}
               alt={product.name}
+              onError={onImgError}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute top-4 left-4">
@@ -174,18 +178,33 @@ export default function ProductDetailPage() {
         {/* Info */}
         <div className="lg:col-span-5 flex flex-col gap-8">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-label-md text-on-surface-variant uppercase tracking-widest">
-                {product.brand ?? `${product.seller.firstName} ${product.seller.lastName}`}
+            {product.brand && (
+              <span className="inter text-[10px] tracking-[1px] uppercase text-muted">
+                {product.brand}
               </span>
-              <div className="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded text-[10px] font-bold text-primary">
-                <span className="material-symbols-outlined filled text-[12px]">verified</span>
-                VERIFIED SELLER
-              </div>
-            </div>
+            )}
             <h1 className="font-display font-semibold text-headline-md lg:text-[44px] lg:leading-[52px] text-on-surface">
               {product.name}
             </h1>
+            <div className="flex items-center gap-2 mt-2">
+              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                <span className="inter text-[9px] text-on-primary font-medium">
+                  {product.seller.firstName[0]}
+                  {product.seller.lastName[0]}
+                </span>
+              </div>
+              <span className="inter text-[12px] text-muted">
+                Sold by{' '}
+                <span className="text-primary border-b border-divider cursor-pointer">
+                  {product.seller.firstName} {product.seller.lastName}
+                </span>{' '}
+                · Verified seller ·{' '}
+                <span className="material-symbols-outlined filled text-[12px] text-primary align-middle">
+                  star
+                </span>{' '}
+                {(product.avgRating ?? 0).toFixed(1)}
+              </span>
+            </div>
             <div className="flex items-end gap-4">
               <p className="font-display text-headline-sm text-on-surface">{money(product.price)}</p>
               {product.comparePrice && (
@@ -233,20 +252,51 @@ export default function ProductDetailPage() {
                   <label className="text-label-md text-on-surface uppercase tracking-widest">Size</label>
                   <span className="text-label-md text-primary underline cursor-pointer">Size Guide</span>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="flex flex-wrap gap-2">
                   {product.sizes.map((s) => (
                     <button
                       key={s}
-                      onClick={() => setSize(s)}
-                      className={`py-3 text-label-md transition-colors ${
-                        size === s
-                          ? 'border-2 border-on-surface bg-on-surface text-surface'
-                          : 'border border-outline-variant hover:border-on-surface'
+                      onClick={() => inStock && setSize(s)}
+                      disabled={!inStock}
+                      className={`inter w-10 h-10 flex items-center justify-center text-[11px] tracking-[1px] rounded-none transition-colors duration-300 ${
+                        !inStock
+                          ? 'size-oos border border-divider text-faded cursor-not-allowed'
+                          : size === s
+                            ? 'bg-primary text-on-primary border border-primary'
+                            : 'border border-divider text-primary hover:border-primary'
                       }`}
                     >
                       {s}
                     </button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Quantity */}
+            {inStock && (
+              <div className="space-y-3">
+                <label className="text-label-md text-on-surface uppercase tracking-widest">
+                  Quantity
+                </label>
+                <div className="inline-flex items-center border border-divider">
+                  <button
+                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    aria-label="Decrease quantity"
+                    className="w-9 h-9 flex items-center justify-center text-primary text-lg hover:bg-divider transition-colors duration-300"
+                  >
+                    −
+                  </button>
+                  <span className="inter w-9 h-9 flex items-center justify-center text-[13px] text-primary border-x border-divider">
+                    {qty}
+                  </span>
+                  <button
+                    onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
+                    aria-label="Increase quantity"
+                    className="w-9 h-9 flex items-center justify-center text-primary text-lg hover:bg-divider transition-colors duration-300"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             )}

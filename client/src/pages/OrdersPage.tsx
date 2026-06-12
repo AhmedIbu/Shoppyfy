@@ -4,6 +4,7 @@ import { api } from '../api/axios';
 import { Order, OrderStatus, money } from '../types';
 import AccountSidebar from '../components/AccountSidebar';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 const statusStyles: Record<OrderStatus, string> = {
   PENDING: 'bg-surface-container text-on-surface-variant',
@@ -90,6 +91,7 @@ export default function OrdersPage() {
                           <img
                             src={first.imageUrl}
                             alt={first.productName}
+                            onError={onImgError}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                         )}

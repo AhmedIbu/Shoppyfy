@@ -4,6 +4,7 @@ import { removeFromWishlist } from '../store/wishlistSlice';
 import { addToCart } from '../store/cartSlice';
 import { money } from '../types';
 import Spinner from '../components/Spinner';
+import { onImgError } from '../utils/imgFallback';
 
 export default function WishlistPage() {
   const navigate = useNavigate();
@@ -75,6 +76,7 @@ export default function WishlistPage() {
                     src={p.images[0]}
                     alt={p.name}
                     onClick={() => navigate(`/products/${p.slug}`)}
+                    onError={onImgError}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 cursor-pointer"
                   />
                   <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-4 pointer-events-none">
