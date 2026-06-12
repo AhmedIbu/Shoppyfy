@@ -30,4 +30,8 @@ export const env = {
     secretKey: process.env.STRIPE_SECRET_KEY ?? '',
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
   },
+  resend: {
+    apiKey: process.env.RESEND_API_KEY ?? '',
+    from: process.env.RESEND_FROM ?? 'onboarding@resend.dev',
+  },
 };

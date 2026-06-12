@@ -148,6 +148,15 @@ export default function SellerDashboardPage() {
     load();
   };
 
+  const reactivate = async (id: string) => {
+    const data = new FormData();
+    data.append('isActive', 'true');
+    await api
+      .patch(`/seller/products/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+      .catch(() => undefined);
+    load();
+  };
+
   if (loading) return <Spinner label="Loading your atelier" />;
 
   const underlineInput =
@@ -371,13 +380,23 @@ export default function SellerDashboardPage() {
                         >
                           edit
                         </button>
-                        {p.isActive && (
+                        {p.isActive ? (
                           <button
                             onClick={() => deactivate(p.id)}
                             aria-label="Deactivate"
+                            title="Deactivate listing"
                             className="material-symbols-outlined text-[20px] text-on-surface-variant hover:text-error"
                           >
                             visibility_off
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => reactivate(p.id)}
+                            aria-label="Reactivate"
+                            title="Reactivate listing"
+                            className="material-symbols-outlined text-[20px] text-on-surface-variant hover:text-primary"
+                          >
+                            visibility
                           </button>
                         )}
                       </div>

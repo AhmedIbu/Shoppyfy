@@ -118,3 +118,36 @@ export const deleteAddress = async (req: Request, res: Response) => {
   await prisma.address.delete({ where: { id: existing.id } });
   res.json({ deleted: true });
 };
+
+// ── Account deletion ────────────────────────────────────
+
+export const deleteMe = async (req: Request, res: Response) => {
+  const userId = req.user!.userId;
+
+  const orderCount = await prisma.order.count({ where: { userId } });
+
+  if (orderCount > 0) {
+    // Anonymize: preserve order history (required for business records) but remove personal data
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        email: `deleted_${userId}@shoppyfy.deleted`,
+        password: '',
+        firstName: 'Deleted',
+        lastName: 'User',
+        avatarUrl: null,
+        refreshToken: null,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    });
+  } else {
+    // No orders — hard delete (cascades to cart, wishlist, addresses, reviews)
+    await prisma.user.delete({ where: { id: userId } });
+  }
+
+  // Clear auth cookies
+  const { clearAuthCookies } = await import('../utils/jwt');
+  clearAuthCookies(res);
+  res.json({ deleted: true });
+};

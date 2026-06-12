@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { OrderStatus, Role } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
+import { sendEmail, emails } from '../config/resend';
 
 export const adminStats = async (_req: Request, res: Response) => {
   const [userCount, productCount, orderCount, paidOrders] = await Promise.all([
@@ -69,7 +70,32 @@ export const deleteUser = async (req: Request, res: Response) => {
   if (req.params.id === req.user!.userId) {
     throw ApiError.badRequest('You cannot delete your own account');
   }
-  await prisma.user.delete({ where: { id: req.params.id } });
+
+  const target = await prisma.user.findUnique({
+    where: { id: req.params.id },
+    select: { id: true, _count: { select: { orders: true } } },
+  });
+  if (!target) throw ApiError.notFound('User not found');
+
+  if (target._count.orders > 0) {
+    // Anonymize instead of hard-delete to preserve order history
+    await prisma.user.update({
+      where: { id: target.id },
+      data: {
+        email: `deleted_${target.id}@shoppyfy.deleted`,
+        password: '',
+        firstName: 'Deleted',
+        lastName: 'User',
+        avatarUrl: null,
+        refreshToken: null,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    });
+  } else {
+    await prisma.user.delete({ where: { id: target.id } });
+  }
+
   res.json({ deleted: true });
 };
 
@@ -95,6 +121,13 @@ const updateOrderSchema = z.object({
 
 export const updateOrder = async (req: Request, res: Response) => {
   const data = updateOrderSchema.parse(req.body);
+
+  const existing = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    select: { status: true, orderNumber: true, trackingNumber: true, carrier: true, userId: true },
+  });
+  if (!existing) throw ApiError.notFound('Order not found');
+
   const order = await prisma.order.update({
     where: { id: req.params.id },
     data: {
@@ -103,6 +136,35 @@ export const updateOrder = async (req: Request, res: Response) => {
     },
     include: { items: true },
   });
+
+  // Send status change emails when order moves to SHIPPED or DELIVERED
+  if (data.status && data.status !== existing.status) {
+    prisma.user
+      .findUnique({ where: { id: existing.userId }, select: { email: true } })
+      .then((user) => {
+        if (!user) return;
+        if (data.status === OrderStatus.SHIPPED) {
+          return sendEmail(
+            user.email,
+            `Shoppyfy — Your order has shipped`,
+            emails.orderShipped(
+              existing.orderNumber,
+              data.trackingNumber ?? existing.trackingNumber,
+              data.carrier ?? existing.carrier
+            )
+          );
+        }
+        if (data.status === OrderStatus.DELIVERED) {
+          return sendEmail(
+            user.email,
+            `Shoppyfy — Your order has been delivered`,
+            emails.orderDelivered(existing.orderNumber)
+          );
+        }
+      })
+      .catch((err) => console.error('[email] order status update:', err));
+  }
+
   res.json({ order });
 };
 

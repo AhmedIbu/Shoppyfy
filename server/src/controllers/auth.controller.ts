@@ -12,6 +12,9 @@ import {
   setAuthCookies,
   clearAuthCookies,
 } from '../utils/jwt';
+import { sendEmail, emails } from '../config/resend';
+import { env } from '../config/env';
+
 
 const publicUser = {
   id: true,
@@ -129,8 +132,10 @@ export const forgotPassword = async (req: Request, res: Response) => {
       where: { id: user.id },
       data: { resetToken, resetTokenExpiry: new Date(Date.now() + 60 * 60 * 1000) },
     });
-    // In production, email this link. In development we log it for convenience.
-    console.log(`🔑 Password reset link: /reset-password?token=${resetToken}`);
+
+    const resetLink = `${env.clientUrl}/reset-password?token=${resetToken}`;
+    console.log(`🔑 Password reset link: ${resetLink}`);
+    await sendEmail(user.email, 'Shoppyfy — Reset your password', emails.passwordReset(resetLink));
   }
 
   res.json({ message: 'If an account exists for that email, a reset link has been sent.' });

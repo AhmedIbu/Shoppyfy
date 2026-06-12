@@ -17,6 +17,7 @@ import checkoutRoutes from './routes/checkout.routes';
 import userRoutes from './routes/user.routes';
 import sellerRoutes from './routes/seller.routes';
 import adminRoutes from './routes/admin.routes';
+import newsletterRoutes from './routes/newsletter.routes';
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

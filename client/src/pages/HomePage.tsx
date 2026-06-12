@@ -4,6 +4,7 @@ import { api } from '../api/axios';
 import { Category, Product } from '../types';
 import ProductCard from '../components/ProductCard';
 import Spinner from '../components/Spinner';
+import toast from 'react-hot-toast';
 
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=2000&q=80';
@@ -174,9 +175,16 @@ export default function HomePage() {
           ) : (
             <form
               className="flex flex-col md:flex-row gap-0 max-w-2xl mx-auto border-b border-surface-variant focus-within:border-primary-fixed transition-colors"
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                if (email) setSubscribed(true);
+                if (!email) return;
+                try {
+                  await api.post('/newsletter', { email });
+                  setSubscribed(true);
+                  toast.success('Welcome to the inner circle!');
+                } catch {
+                  toast.error('Could not subscribe. Please try again.');
+                }
               }}
             >
               <input

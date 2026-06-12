@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api, apiErrorMessage } from '../api/axios';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { setUser } from '../store/authSlice';
+import { logout, setUser } from '../store/authSlice';
+import { resetCart } from '../store/cartSlice';
+import { resetWishlist } from '../store/wishlistSlice';
 import { Address, User } from '../types';
 
 interface AddressForm {
@@ -38,6 +41,7 @@ const sections = [
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const user = useAppSelector((s) => s.auth.user);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -56,6 +60,10 @@ export default function ProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showCurrent, setShowCurrent] = useState(false);
   const [securityMessage, setSecurityMessage] = useState<string | null>(null);
+
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -134,6 +142,25 @@ export default function ProfilePage() {
   const setDefault = async (id: string) => {
     await api.patch(`/users/addresses/${id}`, { isDefault: true }).catch(() => undefined);
     loadAddresses();
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== 'DELETE') {
+      setDeleteError('Type DELETE to confirm');
+      return;
+    }
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await api.delete('/users/me');
+      dispatch(logout());
+      dispatch(resetCart());
+      dispatch(resetWishlist());
+      navigate('/');
+    } catch (err) {
+      setDeleteError(apiErrorMessage(err));
+      setDeleting(false);
+    }
   };
 
   const updatePassword = async () => {
@@ -459,11 +486,25 @@ export default function ProfilePage() {
             <div className="mt-12 p-6 border border-error-container rounded-lg bg-error-container/10">
               <h4 className="text-label-md uppercase text-error mb-2">Danger Zone</h4>
               <p className="text-body-sm text-on-surface-variant mb-4">
-                Once you delete your account, there is no going back. Please be certain.
+                Once you delete your account there is no going back. Type <strong>DELETE</strong> below to confirm.
               </p>
-              <button className="text-error text-label-md uppercase border border-error px-4 py-2 rounded-lg hover:bg-error hover:text-on-error transition-colors">
-                Delete Account
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3 max-w-sm">
+                <input
+                  type="text"
+                  value={deleteConfirm}
+                  onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(null); }}
+                  placeholder="Type DELETE to confirm"
+                  className="flex-1 border border-error bg-transparent px-3 py-2 text-body-sm focus:outline-none focus:ring-1 focus:ring-error"
+                />
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="text-error text-label-md uppercase border border-error px-4 py-2 rounded-lg hover:bg-error hover:text-on-error transition-colors disabled:opacity-50 whitespace-nowrap"
+                >
+                  {deleting ? 'Deleting…' : 'Delete Account'}
+                </button>
+              </div>
+              {deleteError && <p className="mt-2 text-body-sm text-error">{deleteError}</p>}
             </div>
           </div>
         </section>

@@ -35,6 +35,7 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     api
@@ -301,9 +302,41 @@ export default function OrderTrackingPage() {
             )}
           </div>
 
-          <button className="w-full py-4 bg-on-surface text-surface text-label-md uppercase tracking-widest hover:bg-primary-container transition-all active:scale-95">
+          <button
+            onClick={() => setHelpOpen(true)}
+            className="w-full py-4 bg-on-surface text-surface text-label-md uppercase tracking-widest hover:bg-primary-container transition-all active:scale-95"
+          >
             Help with Order
           </button>
+
+          {/* Help modal */}
+          {helpOpen && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-surface border border-outline-variant p-8 max-w-sm w-full shadow-2xl">
+                <h3 className="font-display text-headline-sm mb-4">Need help?</h3>
+                <p className="text-body-sm text-on-surface-variant mb-1">
+                  For issues with order <strong>#{order.orderNumber}</strong>, contact our support team:
+                </p>
+                <a
+                  href={`mailto:support@shoppyfy.com?subject=Help with order ${order.orderNumber}`}
+                  className="text-primary underline underline-offset-4 text-body-sm"
+                >
+                  support@shoppyfy.com
+                </a>
+                <p className="text-body-sm text-on-surface-variant mt-4">
+                  Please include your order number and a brief description of the issue. We typically respond within 24 hours.
+                </p>
+                <div className="mt-8 flex justify-end">
+                  <button
+                    onClick={() => setHelpOpen(false)}
+                    className="px-6 py-2 text-label-md uppercase border border-on-surface hover:bg-on-surface hover:text-surface transition-all"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </aside>
       </div>
     </main>

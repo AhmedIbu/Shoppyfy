@@ -11,6 +11,8 @@ router.patch('/profile', asyncHandler(users.updateProfile));
 router.post('/avatar', upload.single('avatar'), asyncHandler(users.uploadAvatar));
 router.patch('/password', asyncHandler(users.changePassword));
 
+router.delete('/me', asyncHandler(users.deleteMe));
+
 router.get('/addresses', asyncHandler(users.listAddresses));
 router.post('/addresses', asyncHandler(users.createAddress));
 router.patch('/addresses/:id', asyncHandler(users.updateAddress));

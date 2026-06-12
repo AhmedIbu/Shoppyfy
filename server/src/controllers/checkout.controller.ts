@@ -6,6 +6,7 @@ import { prisma } from '../config/prisma';
 import { stripe } from '../config/stripe';
 import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
+import { sendEmail, emails } from '../config/resend';
 
 const SHIPPING_FLAT = 12;
 const FREE_SHIPPING_THRESHOLD = 250;
@@ -30,11 +31,6 @@ const checkoutSchema = z.union([
   z.object({ address: addressSchema, saveAddress: z.boolean().optional() }),
 ]);
 
-/**
- * Creates a PENDING order from the user's cart (server-side pricing) and a
- * Stripe PaymentIntent for the total. Returns the clientSecret for the
- * Payment Element on the client.
- */
 export const createPaymentIntent = async (req: Request, res: Response) => {
   const body = checkoutSchema.parse(req.body);
   const userId = req.user!.userId;
@@ -52,7 +48,6 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
     }
   }
 
-  // Resolve the shipping address
   let ship: z.infer<typeof addressSchema>;
   if ('addressId' in body) {
     const address = await prisma.address.findUnique({ where: { id: body.addressId } });
@@ -111,6 +106,7 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
         })),
       },
     },
+    include: { items: true },
   });
 
   const paymentIntent = await stripe.paymentIntents.create({
@@ -138,7 +134,7 @@ const fulfillOrder = async (orderId: string) => {
   const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
   if (!order || order.status !== OrderStatus.PENDING) return order;
 
-  return prisma.$transaction(async (tx) => {
+  const fulfilled = await prisma.$transaction(async (tx) => {
     for (const item of order.items) {
       if (item.productId) {
         await tx.product.update({
@@ -156,12 +152,29 @@ const fulfillOrder = async (orderId: string) => {
       },
     });
   });
+
+  // Send order confirmation email (non-blocking)
+  prisma.user
+    .findUnique({ where: { id: order.userId }, select: { email: true } })
+    .then((user) => {
+      if (!user) return;
+      const itemLines = order.items
+        .map(
+          (i) =>
+            `<div class="item">${i.productName} × ${i.quantity} — $${Number(i.price).toFixed(2)}</div>`
+        )
+        .join('');
+      return sendEmail(
+        user.email,
+        `Shoppyfy — Order confirmed #${order.orderNumber}`,
+        emails.orderConfirmed(order.orderNumber, itemLines, `$${Number(order.total).toFixed(2)}`)
+      );
+    })
+    .catch((err) => console.error('[email] order confirmed:', err));
+
+  return fulfilled;
 };
 
-/**
- * Client-side confirmation fallback for local dev (no webhook forwarding).
- * Verifies the PaymentIntent status with Stripe before fulfilling.
- */
 export const confirmOrder = async (req: Request, res: Response) => {
   const order = await prisma.order.findUnique({ where: { id: req.params.id } });
   if (!order || order.userId !== req.user!.userId) throw ApiError.notFound('Order not found');
@@ -176,7 +189,6 @@ export const confirmOrder = async (req: Request, res: Response) => {
   res.json({ order: fulfilled });
 };
 
-/** Stripe webhook — mounted with express.raw() BEFORE the JSON body parser. */
 export const stripeWebhook = async (req: Request, res: Response) => {
   const signature = req.headers['stripe-signature'];
   let event: Stripe.Event;

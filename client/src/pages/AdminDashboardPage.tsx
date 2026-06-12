@@ -71,6 +71,16 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleDeleteUser = async (id: string, email: string) => {
+    if (!window.confirm(`Delete account for ${email}? Orders are preserved but personal data is removed.`)) return;
+    try {
+      await api.delete(`/admin/users/${id}`);
+      load();
+    } catch (err) {
+      setMessage(apiErrorMessage(err));
+    }
+  };
+
   const updateOrderStatus = async (id: string, status: string) => {
     try {
       await api.patch(`/admin/orders/${id}`, { status });
@@ -147,15 +157,25 @@ export default function AdminDashboardPage() {
                   <td className="py-4 pr-4 text-body-sm">{u._count.orders}</td>
                   <td className="py-4 pr-4 text-body-sm">{u._count.products}</td>
                   <td className="py-4">
-                    <select
-                      value={u.role}
-                      onChange={(e) => updateRole(u.id, e.target.value)}
-                      className="bg-transparent border border-outline-variant px-2 py-1 text-label-md uppercase focus:ring-0 cursor-pointer"
-                    >
-                      <option value="BUYER">Buyer</option>
-                      <option value="SELLER">Seller</option>
-                      <option value="ADMIN">Admin</option>
-                    </select>
+                    <div className="flex items-center gap-3">
+                      <select
+                        value={u.role}
+                        onChange={(e) => updateRole(u.id, e.target.value)}
+                        className="bg-transparent border border-outline-variant px-2 py-1 text-label-md uppercase focus:ring-0 cursor-pointer"
+                      >
+                        <option value="BUYER">Buyer</option>
+                        <option value="SELLER">Seller</option>
+                        <option value="ADMIN">Admin</option>
+                      </select>
+                      <button
+                        onClick={() => handleDeleteUser(u.id, u.email)}
+                        aria-label="Delete user"
+                        title="Delete account"
+                        className="material-symbols-outlined text-[18px] text-on-surface-variant hover:text-error transition-colors"
+                      >
+                        delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
