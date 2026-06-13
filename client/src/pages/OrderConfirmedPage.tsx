@@ -156,7 +156,7 @@ export default function OrderConfirmedPage() {
             </Link>
             <Link
               to="/shop"
-              className="w-full h-16 border border-on-surface text-on-surface text-label-md uppercase tracking-widest hover:bg-on-surface hover:text-surface transition-all active:scale-[0.98] flex items-center justify-center"
+              className="w-full h-16 border border-primary text-primary text-label-md uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all active:scale-[0.98] flex items-center justify-center"
             >
               Continue Shopping
             </Link>

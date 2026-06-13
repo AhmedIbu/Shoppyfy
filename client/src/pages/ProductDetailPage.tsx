@@ -174,7 +174,7 @@ export default function ProductDetailPage() {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute top-4 left-4">
-              <span className="bg-on-surface text-surface text-[10px] px-3 py-1 uppercase tracking-widest">
+              <span className="bg-brand-green text-white text-[10px] px-3 py-1 uppercase tracking-widest">
                 {conditionLabel[product.condition]}
               </span>
             </div>
@@ -245,7 +245,7 @@ export default function ProductDetailPage() {
                       }}
                       className={`px-4 py-2 text-label-md border transition-all ${
                         color === c
-                          ? 'border-on-surface bg-on-surface text-surface'
+                          ? 'border-primary bg-primary text-on-primary'
                           : 'border-outline-variant hover:border-on-surface'
                       }`}
                     >

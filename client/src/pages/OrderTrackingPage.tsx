@@ -305,7 +305,7 @@ export default function OrderTrackingPage() {
 
           <button
             onClick={() => setHelpOpen(true)}
-            className="w-full py-4 bg-on-surface text-surface text-label-md uppercase tracking-widest hover:bg-primary-container transition-all active:scale-95"
+            className="w-full py-4 bg-primary text-on-primary text-label-md uppercase tracking-widest hover:bg-primary-container transition-all active:scale-95"
           >
             Help with Order
           </button>
@@ -330,7 +330,7 @@ export default function OrderTrackingPage() {
                 <div className="mt-8 flex justify-end">
                   <button
                     onClick={() => setHelpOpen(false)}
-                    className="px-6 py-2 text-label-md uppercase border border-on-surface hover:bg-on-surface hover:text-surface transition-all"
+                    className="px-6 py-2 text-label-md uppercase border border-primary text-primary hover:bg-primary hover:text-on-primary transition-all"
                   >
                     Close
                   </button>

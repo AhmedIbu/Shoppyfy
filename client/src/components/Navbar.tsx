@@ -194,7 +194,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/login"
-                  className="hidden sm:inline-block text-label-md uppercase border border-on-surface px-4 py-2 hover:bg-on-surface hover:text-surface transition-all"
+                  className="hidden sm:inline-block text-label-md uppercase border border-primary text-primary px-4 py-2 hover:bg-primary hover:text-on-primary transition-all"
                 >
                   Sign In
                 </Link>

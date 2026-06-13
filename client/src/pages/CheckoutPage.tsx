@@ -42,7 +42,7 @@ function StepHeading({ n, label, done, active }: { n: number; label: string; don
           done
             ? 'bg-primary text-on-primary'
             : active
-              ? 'bg-on-surface text-surface'
+              ? 'bg-primary text-on-primary'
               : 'border border-on-surface text-on-surface'
         }`}
       >

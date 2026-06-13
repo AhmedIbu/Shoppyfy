@@ -104,23 +104,25 @@ export default function ProductCard({ product }: { product: Product }) {
           favorite
         </button>
 
-        {/* Hover overlay with quick add — pointer-events only on hover so a tap
-            on the card (mobile, no hover) opens the product page instead */}
+        {/* Quick Add — a small button pinned to the bottom, revealed on hover.
+            It only covers the bottom strip, so clicking anywhere else on the
+            card opens the product page. On mobile (no hover) it stays hidden
+            and a tap always navigates. */}
         {product.stock > 0 ? (
-          <button
-            onClick={handleQuickAdd}
-            disabled={adding}
-            className="absolute inset-0 bg-primary/50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 flex items-center justify-center disabled:cursor-not-allowed"
-          >
-            <span className="inter text-[10px] tracking-[2px] uppercase text-on-primary border-b border-on-primary/80 pb-0.5">
+          <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 pointer-events-none translate-y-2 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 transition-all duration-300">
+            <button
+              onClick={handleQuickAdd}
+              disabled={adding}
+              className="w-full bg-primary text-on-primary py-2.5 text-[10px] tracking-[2px] uppercase font-medium hover:bg-primary-container transition-colors disabled:opacity-60"
+            >
               {adding ? 'Adding…' : 'Quick Add'}
-            </span>
-          </button>
+            </button>
+          </div>
         ) : (
-          <div className="absolute inset-0 bg-primary/50 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <span className="inter text-[10px] tracking-[2px] uppercase text-on-primary/80">
+          <div className="absolute inset-x-0 bottom-0 p-3 pointer-events-none">
+            <div className="w-full bg-on-surface/85 text-surface text-center py-2.5 text-[10px] tracking-[2px] uppercase">
               Sold Out
-            </span>
+            </div>
           </div>
         )}
       </div>

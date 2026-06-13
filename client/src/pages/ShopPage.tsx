@@ -166,7 +166,7 @@ export default function ShopPage() {
                   onClick={() => toggleSize(size)}
                   className={`border py-2 text-label-md transition-all ${
                     selectedSizes.includes(size)
-                      ? 'border-on-surface bg-on-surface text-surface'
+                      ? 'border-primary bg-primary text-on-primary'
                       : 'border-outline-variant hover:border-on-surface'
                   }`}
                 >
@@ -305,7 +305,7 @@ export default function ShopPage() {
                   onClick={() => setParam('page', String(i + 1))}
                   className={`w-10 h-10 flex items-center justify-center text-label-md border transition-all ${
                     page === i + 1
-                      ? 'border-on-surface bg-on-surface text-surface'
+                      ? 'border-primary bg-primary text-on-primary'
                       : 'border-outline-variant text-on-surface hover:border-on-surface'
                   }`}
                 >

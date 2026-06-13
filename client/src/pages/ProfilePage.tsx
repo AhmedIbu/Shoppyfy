@@ -275,7 +275,7 @@ export default function ProfilePage() {
               {profileMessage && <p className="text-body-sm text-primary">{profileMessage}</p>}
               <button
                 onClick={saveProfile}
-                className="bg-on-surface text-surface px-8 py-3 rounded-lg text-label-md uppercase hover:bg-primary transition-all active:scale-95"
+                className="bg-primary text-on-primary px-8 py-3 rounded-lg text-label-md uppercase hover:bg-primary-container transition-all active:scale-95"
               >
                 Save Changes
               </button>
@@ -340,7 +340,7 @@ export default function ProfilePage() {
                 <div className="flex gap-4 pt-2">
                   <button
                     onClick={saveAddress}
-                    className="bg-on-surface text-surface px-6 py-2.5 rounded-lg text-label-md uppercase hover:bg-primary transition-all"
+                    className="bg-primary text-on-primary px-6 py-2.5 rounded-lg text-label-md uppercase hover:bg-primary-container transition-all"
                   >
                     Save Address
                   </button>
@@ -478,7 +478,7 @@ export default function ProfilePage() {
               {securityMessage && <p className="text-body-sm text-primary">{securityMessage}</p>}
               <button
                 onClick={updatePassword}
-                className="w-full md:w-auto bg-on-surface text-surface px-8 py-3 rounded-lg text-label-md uppercase hover:bg-primary transition-all mt-4"
+                className="w-full md:w-auto bg-primary text-on-primary px-8 py-3 rounded-lg text-label-md uppercase hover:bg-primary-container transition-all mt-4"
               >
                 Update Password
               </button>

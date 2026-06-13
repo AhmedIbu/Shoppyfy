@@ -41,7 +41,7 @@ export default function WishlistPage() {
           <div className="flex gap-4">
             <button
               onClick={moveAllToBag}
-              className="border border-on-surface px-6 py-3 text-label-md uppercase hover:bg-on-surface hover:text-surface transition-all flex items-center gap-2"
+              className="border border-primary text-primary px-6 py-3 text-label-md uppercase hover:bg-primary hover:text-on-primary transition-all flex items-center gap-2"
             >
               Move All to Bag
             </button>
@@ -60,7 +60,7 @@ export default function WishlistPage() {
           </div>
           <Link
             to="/shop"
-            className="mt-4 px-12 py-4 bg-on-surface text-on-primary text-label-md uppercase hover:bg-primary transition-all duration-300"
+            className="mt-4 px-12 py-4 bg-primary text-on-primary text-label-md uppercase hover:bg-primary-container transition-all duration-300"
           >
             Discover the Curation
           </Link>
@@ -90,7 +90,7 @@ export default function WishlistPage() {
                     {p.stock > 0 ? (
                       <button
                         onClick={() => moveToBag(p.id, p.sizes, p.colors)}
-                        className="w-full bg-on-surface text-surface py-3 text-label-md uppercase hover:bg-primary transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 pointer-events-auto"
+                        className="w-full bg-primary text-on-primary py-3 text-label-md uppercase hover:bg-primary-container transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 pointer-events-auto"
                       >
                         Move to Bag
                       </button>

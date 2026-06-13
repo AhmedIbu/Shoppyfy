@@ -116,7 +116,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="submit"
                   disabled={state === 'sending'}
-                  className="w-full bg-on-surface text-surface-container-lowest text-label-md uppercase py-5 flex justify-between items-center px-8 group hover:bg-primary transition-all duration-300 disabled:opacity-70"
+                  className="w-full bg-primary text-on-primary text-label-md uppercase py-5 flex justify-between items-center px-8 group hover:bg-primary-container transition-all duration-300 disabled:opacity-70"
                 >
                   <span>{state === 'sending' ? 'Updating…' : 'Update Password'}</span>
                   <span className="material-symbols-outlined transform group-hover:translate-x-1 transition-transform">
@@ -149,7 +149,7 @@ export default function ResetPasswordPage() {
                   className={`w-full text-label-md uppercase py-5 flex justify-between items-center px-8 group transition-all duration-300 ${
                     state === 'sent'
                       ? 'bg-primary text-on-primary'
-                      : 'bg-on-surface text-surface-container-lowest hover:bg-primary disabled:opacity-70'
+                      : 'bg-primary text-on-primary hover:bg-primary-container disabled:opacity-70'
                   }`}
                 >
                   <span>

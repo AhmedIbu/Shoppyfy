@@ -12,7 +12,7 @@ export default function NotFoundPage() {
       </p>
       <Link
         to="/"
-        className="bg-on-surface text-surface px-12 py-4 text-label-md uppercase tracking-widest hover:bg-primary transition-all"
+        className="bg-primary text-on-primary px-12 py-4 text-label-md uppercase tracking-widest hover:bg-primary-container transition-all"
       >
         Return Home
       </Link>

@@ -134,7 +134,7 @@ export default function OrdersPage() {
                         <div className="mt-8 flex flex-wrap gap-4">
                           <Link
                             to={`/orders/${order.id}/track`}
-                            className="bg-on-surface text-surface text-label-md uppercase px-8 py-3 hover:bg-primary transition-all active:scale-95"
+                            className="bg-primary text-on-primary text-label-md uppercase px-8 py-3 hover:bg-primary-container transition-all active:scale-95"
                           >
                             Track Order
                           </Link>

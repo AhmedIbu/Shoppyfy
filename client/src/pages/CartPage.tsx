@@ -36,7 +36,7 @@ export default function CartPage() {
           </div>
           <Link
             to="/shop"
-            className="mt-4 px-12 py-4 bg-on-surface text-on-primary text-label-md uppercase hover:bg-primary transition-all duration-300"
+            className="mt-4 px-12 py-4 bg-primary text-on-primary text-label-md uppercase hover:bg-primary-container transition-all duration-300"
           >
             Start Shopping
           </Link>
@@ -186,7 +186,7 @@ export default function CartPage() {
                 </div>
                 <button
                   onClick={() => navigate('/checkout')}
-                  className="w-full bg-on-surface text-on-primary py-5 text-label-md uppercase hover:bg-primary transition-all duration-300 active:scale-[0.98]"
+                  className="w-full bg-primary text-on-primary py-5 text-label-md uppercase hover:bg-primary-container transition-all duration-300 active:scale-[0.98]"
                 >
                   Proceed to Checkout
                 </button>
