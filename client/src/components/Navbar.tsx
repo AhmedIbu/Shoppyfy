@@ -103,12 +103,14 @@ export default function Navbar() {
 
           {/* Right: actions */}
           <div className="flex items-center justify-end gap-3 md:gap-6 flex-1">
-            <Link
-              to={user?.role === 'SELLER' || user?.role === 'ADMIN' ? '/seller' : '/register?role=seller'}
-              className="hidden lg:block text-on-surface text-label-md uppercase hover:text-primary transition-colors"
-            >
-              Sell on SEMMAI
-            </Link>
+            {user?.role === 'ADMIN' && (
+              <Link
+                to="/sell"
+                className="hidden lg:block text-on-surface text-label-md uppercase hover:text-primary transition-colors"
+              >
+                Sell
+              </Link>
+            )}
             <div className="flex items-center gap-4">
               <button
                 aria-label="Search"
@@ -164,10 +166,12 @@ export default function Navbar() {
                         { label: 'My Profile', to: '/profile' },
                         { label: 'My Orders', to: '/orders' },
                         { label: 'Wishlist', to: '/wishlist' },
-                        ...(user.role === 'SELLER' || user.role === 'ADMIN'
-                          ? [{ label: 'Seller Dashboard', to: '/seller' }]
+                        ...(user.role === 'ADMIN'
+                          ? [
+                              { label: 'Sell', to: '/sell' },
+                              { label: 'Admin', to: '/admin' },
+                            ]
                           : []),
-                        ...(user.role === 'ADMIN' ? [{ label: 'Admin', to: '/admin' }] : []),
                       ].map((item) => (
                         <Link
                           key={item.to}
@@ -223,13 +227,15 @@ export default function Navbar() {
                 {link.label}
               </NavLink>
             ))}
-            <NavLink
-              to={user?.role === 'SELLER' || user?.role === 'ADMIN' ? '/seller' : '/register?role=seller'}
-              onClick={closeMobile}
-              className="font-display text-[28px] text-surface border-b border-surface/20 py-6 hover:text-primary-fixed transition-colors"
-            >
-              Sell on SEMMAI
-            </NavLink>
+            {user?.role === 'ADMIN' && (
+              <NavLink
+                to="/sell"
+                onClick={closeMobile}
+                className="font-display text-[28px] text-surface border-b border-surface/20 py-6 hover:text-primary-fixed transition-colors"
+              >
+                Sell
+              </NavLink>
+            )}
           </nav>
           <div className="px-6 py-8 mt-auto border-t border-surface/20 flex flex-col gap-4">
             {user ? (
@@ -241,10 +247,12 @@ export default function Navbar() {
                   { label: 'My Profile', to: '/profile' },
                   { label: 'My Orders', to: '/orders' },
                   { label: 'Wishlist', to: '/wishlist' },
-                  ...(user.role === 'SELLER' || user.role === 'ADMIN'
-                    ? [{ label: 'Seller Dashboard', to: '/seller' }]
+                  ...(user.role === 'ADMIN'
+                    ? [
+                        { label: 'Sell', to: '/sell' },
+                        { label: 'Admin', to: '/admin' },
+                      ]
                     : []),
-                  ...(user.role === 'ADMIN' ? [{ label: 'Admin', to: '/admin' }] : []),
                 ].map((item) => (
                   <Link
                     key={item.to}

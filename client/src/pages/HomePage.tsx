@@ -72,10 +72,10 @@ export default function HomePage() {
               Shop New Arrivals
             </button>
             <button
-              onClick={() => navigate('/register?role=seller')}
+              onClick={() => navigate('/shop')}
               className="inter bg-transparent border border-on-primary/35 text-on-primary py-3 px-7 text-[10px] tracking-[2px] uppercase font-medium rounded-none hover:bg-on-primary/10 transition-colors duration-300"
             >
-              Start Selling
+              Explore the Collection
             </button>
           </div>
         </div>

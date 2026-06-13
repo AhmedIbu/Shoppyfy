@@ -22,7 +22,7 @@ import OrdersPage from './pages/OrdersPage';
 import OrderTrackingPage from './pages/OrderTrackingPage';
 import WishlistPage from './pages/WishlistPage';
 import ProfilePage from './pages/ProfilePage';
-import SellerDashboardPage from './pages/SellerDashboardPage';
+import SellPage from './pages/SellPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -70,11 +70,8 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
-        <Route element={<ProtectedRoute roles={['SELLER']} />}>
-          <Route path="/seller" element={<SellerDashboardPage />} />
-        </Route>
-
         <Route element={<ProtectedRoute roles={['ADMIN']} />}>
+          <Route path="/sell" element={<SellPage />} />
           <Route path="/admin" element={<AdminDashboardPage />} />
         </Route>
 

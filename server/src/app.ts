@@ -15,7 +15,6 @@ import wishlistRoutes from './routes/wishlist.routes';
 import orderRoutes from './routes/order.routes';
 import checkoutRoutes from './routes/checkout.routes';
 import userRoutes from './routes/user.routes';
-import sellerRoutes from './routes/seller.routes';
 import adminRoutes from './routes/admin.routes';
 import newsletterRoutes from './routes/newsletter.routes';
 
@@ -41,7 +40,6 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/seller', sellerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 

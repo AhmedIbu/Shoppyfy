@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { clearAuthError, login, register } from '../store/authSlice';
 import { onImgError } from '../utils/imgFallback';
@@ -13,12 +13,10 @@ export default function AuthPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
   const { user, status, error } = useAppSelector((s) => s.auth);
 
-  const isSeller = searchParams.get('role') === 'seller';
   const initMode: 'login' | 'register' =
-    isSeller || location.pathname === '/register' ? 'register' : 'login';
+    location.pathname === '/register' ? 'register' : 'login';
   const [mode, setMode] = useState<'login' | 'register'>(initMode);
 
   const switchMode = (next: 'login' | 'register') => {
@@ -33,7 +31,6 @@ export default function AuthPage() {
   const [showLoginPw, setShowLoginPw] = useState(false);
 
   // ── Register form state ───────────────────────────────
-  const [role, setRole] = useState<'BUYER' | 'SELLER'>(isSeller ? 'SELLER' : 'BUYER');
   const [fullName, setFullName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
@@ -49,8 +46,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (!user) return;
-    if (user.role === 'SELLER') navigate('/seller', { replace: true });
-    else navigate(from, { replace: true });
+    navigate(from, { replace: true });
   }, [user, navigate, from]);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -76,7 +72,6 @@ export default function AuthPage() {
         lastName: rest.join(' ') || firstName,
         email: regEmail,
         password: regPassword,
-        role,
       })
     );
   };
@@ -183,24 +178,6 @@ export default function AuthPage() {
         <p className="text-body-sm text-on-surface-variant mb-6">Join the editorial ecosystem</p>
 
         <form className="space-y-5" onSubmit={handleRegister}>
-          {/* Role selector */}
-          <div className="flex gap-3">
-            {(['BUYER', 'SELLER'] as const).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRole(r)}
-                className={`flex-1 py-2 px-4 border text-label-md uppercase tracking-wide transition-all duration-200 ${
-                  role === r
-                    ? 'border-primary bg-primary text-on-primary'
-                    : 'border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary'
-                }`}
-              >
-                {r === 'BUYER' ? 'Buy' : 'Sell'}
-              </button>
-            ))}
-          </div>
-
           {[
             { value: fullName, set: setFullName, placeholder: 'Full Name', type: 'text', label: 'Name' },
             { value: regEmail, set: setRegEmail, placeholder: 'Email Address', type: 'email', label: 'Email' },

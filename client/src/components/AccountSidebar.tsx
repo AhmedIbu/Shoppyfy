@@ -5,7 +5,7 @@ const links = [
   { to: '/', icon: 'home', label: 'Home', exact: true },
   { to: '/orders', icon: 'shopping_bag', label: 'My Orders' },
   { to: '/wishlist', icon: 'favorite', label: 'Wishlist' },
-  { to: '/seller', icon: 'sell', label: 'Selling', sellerOnly: true },
+  { to: '/sell', icon: 'sell', label: 'Sell', adminOnly: true },
   { to: '/profile', icon: 'person', label: 'Profile Settings' },
 ];
 
@@ -20,7 +20,7 @@ export default function AccountSidebar() {
       </div>
       <nav className="flex flex-col gap-1">
         {links
-          .filter((link) => !link.sellerOnly || user?.role === 'SELLER' || user?.role === 'ADMIN')
+          .filter((link) => !link.adminOnly || user?.role === 'ADMIN')
           .map((link) => (
             <NavLink
               key={link.to}

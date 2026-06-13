@@ -82,8 +82,7 @@ Use Stripe test card `4242 4242 4242 4242` with any future expiry/CVC.
 | Checkout | `POST /api/checkout/create-payment-intent`, `POST /api/webhooks/stripe` |
 | Orders | `GET /api/orders`, `GET /api/orders/:id`, `POST /api/orders/:id/confirm · cancel` |
 | Users | `PATCH /api/users/profile · password`, `POST /api/users/avatar`, addresses CRUD under `/api/users/addresses` |
-| Seller | `GET /api/seller/stats · products · orders`, `POST/PATCH/DELETE /api/seller/products` (multipart image upload) |
-| Admin | `GET /api/admin/stats · users · orders · products`, `PATCH /api/admin/users/:id/role`, `PATCH /api/admin/orders/:id` |
+| Admin | `GET /api/admin/stats · users · orders · products`, `PATCH /api/admin/users/:id/role`, `PATCH /api/admin/orders/:id`; catalog authoring: `POST/PATCH/DELETE /api/admin/products` (multipart image upload) and `POST/PATCH/DELETE /api/admin/categories` |
 
 Auth uses short-lived access tokens + rotating refresh tokens, both in httpOnly cookies. The axios client (`client/src/api/axios.ts`) auto-refreshes on 401 and retries. Roles: `BUYER`, `SELLER`, `ADMIN` (admin passes every gate).
 

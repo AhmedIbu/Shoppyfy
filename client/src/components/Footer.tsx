@@ -5,9 +5,8 @@ const columns = [
     heading: 'Explore',
     links: [
       { label: 'New Arrivals', to: '/shop?sort=newest' },
-      { label: 'Designers', to: '/shop' },
-      { label: 'Sell on SEMMAI', to: '/register?role=seller' },
-      { label: 'Sustainable Fashion', to: '/shop?condition=LIKE_NEW' },
+      { label: 'Shop All', to: '/shop' },
+      { label: 'Featured', to: '/shop' },
     ],
   },
   {
