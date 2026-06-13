@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { OrderStatus } from '@prisma/client';
 import { prisma } from '../config/prisma';
-import { razorpay } from '../config/razorpay';
+import { getRazorpay } from '../config/razorpay';
 import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
 import { sendEmail, emails } from '../config/resend';
@@ -110,7 +110,7 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
   });
 
   // Razorpay amounts are in paise (₹1 = 100 paise)
-  const rzpOrder = await razorpay.orders.create({
+  const rzpOrder = await getRazorpay().orders.create({
     amount: Math.round(total * 100),
     currency: 'INR',
     receipt: order.orderNumber,
