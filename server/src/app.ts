@@ -20,7 +20,32 @@ import newsletterRoutes from './routes/newsletter.routes';
 
 const app = express();
 
-app.use(cors({ origin: env.clientUrl, credentials: true }));
+// CORS allowlist — normalise trailing slashes and accept a comma-separated
+// CLIENT_URL plus the known production client + local dev origins. With
+// credentials enabled we must reflect the exact origin (never use '*').
+const normalizeOrigin = (u: string) => u.trim().replace(/\/+$/, '');
+const allowedOrigins = new Set(
+  [
+    ...env.clientUrl.split(','),
+    'https://shoppyfy-client.vercel.app',
+    'http://localhost:5173',
+  ]
+    .map(normalizeOrigin)
+    .filter(Boolean)
+);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      // allow non-browser requests (no Origin header) and any allowlisted origin
+      if (!origin || allowedOrigins.has(normalizeOrigin(origin))) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 if (!env.isProd) app.use(morgan('dev'));
 
