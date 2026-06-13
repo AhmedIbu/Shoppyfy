@@ -244,9 +244,9 @@ const csv = z
   .transform((v) => (Array.isArray(v) ? v : v.split(',').map((s) => s.trim()).filter(Boolean)));
 
 const productSchema = z.object({
-  name: z.string().min(2),
-  description: z.string().min(10),
-  price: z.coerce.number().positive(),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  description: z.string().min(1, 'Please add a short description'),
+  price: z.coerce.number().positive('Price must be greater than 0'),
   comparePrice: z.coerce.number().positive().optional(),
   categoryId: z.string().min(1),
   sizes: csv.default([]),
