@@ -86,6 +86,12 @@ export default function ProductDetailPage() {
   const wishlisted = selectIsWishlisted(wishlistItems, product.id);
   const inStock = product.stock > 0;
 
+  // Gallery follows the selected colour when that colour has its own images,
+  // otherwise falls back to the full product gallery.
+  const gallery =
+    color && product.colorImages?.[color]?.length ? product.colorImages[color] : product.images;
+  const activeImage = gallery[Math.min(imageIndex, gallery.length - 1)] ?? gallery[0];
+
   const requireAuth = () => {
     if (!user) {
       navigate('/login');
@@ -146,12 +152,12 @@ export default function ProductDetailPage() {
         {/* Gallery */}
         <div className="lg:col-span-7 flex flex-col md:flex-row gap-4">
           <div className="order-2 md:order-1 flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto hide-scrollbar md:w-24">
-            {product.images.map((image, i) => (
+            {gallery.map((image, i) => (
               <button
-                key={i}
+                key={`${image}-${i}`}
                 onClick={() => setImageIndex(i)}
                 className={`flex-shrink-0 w-20 h-24 overflow-hidden transition-colors ${
-                  i === imageIndex
+                  i === Math.min(imageIndex, gallery.length - 1)
                     ? 'border-2 border-primary'
                     : 'border border-outline-variant hover:border-primary'
                 }`}
@@ -162,7 +168,7 @@ export default function ProductDetailPage() {
           </div>
           <div className="order-1 md:order-2 flex-grow aspect-[4/5] bg-surface-container overflow-hidden group relative">
             <img
-              src={product.images[imageIndex]}
+              src={activeImage}
               alt={product.name}
               onError={onImgError}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -233,7 +239,10 @@ export default function ProductDetailPage() {
                   {product.colors.map((c) => (
                     <button
                       key={c}
-                      onClick={() => setColor(c)}
+                      onClick={() => {
+                        setColor(c);
+                        setImageIndex(0);
+                      }}
                       className={`px-4 py-2 text-label-md border transition-all ${
                         color === c
                           ? 'border-on-surface bg-on-surface text-surface'

@@ -104,19 +104,20 @@ export default function ProductCard({ product }: { product: Product }) {
           favorite
         </button>
 
-        {/* Hover overlay with quick add */}
+        {/* Hover overlay with quick add — pointer-events only on hover so a tap
+            on the card (mobile, no hover) opens the product page instead */}
         {product.stock > 0 ? (
           <button
             onClick={handleQuickAdd}
             disabled={adding}
-            className="absolute inset-0 bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center disabled:cursor-not-allowed"
+            className="absolute inset-0 bg-primary/50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 flex items-center justify-center disabled:cursor-not-allowed"
           >
             <span className="inter text-[10px] tracking-[2px] uppercase text-on-primary border-b border-on-primary/80 pb-0.5">
               {adding ? 'Adding…' : 'Quick Add'}
             </span>
           </button>
         ) : (
-          <div className="absolute inset-0 bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <div className="absolute inset-0 bg-primary/50 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <span className="inter text-[10px] tracking-[2px] uppercase text-on-primary/80">
               Sold Out
             </span>

@@ -30,6 +30,7 @@ export interface Product {
   images: string[];
   sizes: string[];
   colors: string[];
+  colorImages?: Record<string, string[]> | null;
   brand: string | null;
   condition: ProductCondition;
   stock: number;

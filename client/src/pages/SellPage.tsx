@@ -15,7 +15,6 @@ interface ProductForm {
   comparePrice: string;
   categoryId: string;
   sizes: string;
-  colors: string;
   brand: string;
   condition: 'NEW' | 'LIKE_NEW' | 'GOOD' | 'FAIR';
   stock: string;
@@ -29,12 +28,21 @@ const emptyForm: ProductForm = {
   comparePrice: '',
   categoryId: '',
   sizes: '',
-  colors: '',
   brand: '',
   condition: 'NEW',
   stock: '1',
   isFeatured: false,
 };
+
+// One colour variant of a product, each with its own images.
+// `keep` = existing image URLs retained on edit; `files` = newly chosen uploads.
+interface Variant {
+  color: string;
+  keep: string[];
+  files: File[];
+}
+
+const emptyVariant = (): Variant => ({ color: '', keep: [], files: [] });
 
 const underlineInput =
   'w-full bg-transparent border-0 border-b border-outline-variant py-2 focus:border-gold focus:ring-0 focus:outline-none text-body-md transition-colors';
@@ -49,8 +57,7 @@ export default function SellPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<ProductForm>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [keepImages, setKeepImages] = useState<string[]>([]);
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [variants, setVariants] = useState<Variant[]>([emptyVariant()]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -84,8 +91,7 @@ export default function SellPage() {
   const openCreate = () => {
     setForm({ ...emptyForm, categoryId: categories[0]?.id ?? '' });
     setEditingId(null);
-    setKeepImages([]);
-    setFiles(null);
+    setVariants([emptyVariant()]);
     setMessage(null);
     setShowForm(true);
   };
@@ -98,21 +104,42 @@ export default function SellPage() {
       comparePrice: p.comparePrice ? String(p.comparePrice) : '',
       categoryId: p.category.id,
       sizes: p.sizes.join(', '),
-      colors: p.colors.join(', '),
       brand: p.brand ?? '',
       condition: p.condition,
       stock: String(p.stock),
       isFeatured: p.isFeatured,
     });
+    // Rebuild variants from the stored colour→images map. Legacy products
+    // (no colorImages) collapse into one unnamed variant holding all images.
+    const ci = p.colorImages;
+    if (ci && Object.keys(ci).length > 0) {
+      setVariants(Object.entries(ci).map(([color, urls]) => ({ color, keep: [...urls], files: [] })));
+    } else {
+      setVariants([{ color: '', keep: [...p.images], files: [] }]);
+    }
     setEditingId(p.id);
-    setKeepImages([...p.images]);
-    setFiles(null);
     setMessage(null);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const addVariant = () => setVariants((v) => [...v, emptyVariant()]);
+  const removeVariant = (i: number) => setVariants((v) => v.filter((_, idx) => idx !== i));
+  const setVariantColor = (i: number, color: string) =>
+    setVariants((v) => v.map((x, idx) => (idx === i ? { ...x, color } : x)));
+  const setVariantFiles = (i: number, fl: FileList | null) =>
+    setVariants((v) => v.map((x, idx) => (idx === i ? { ...x, files: fl ? Array.from(fl) : [] } : x)));
+  const removeVariantKeep = (i: number, url: string) =>
+    setVariants((v) =>
+      v.map((x, idx) => (idx === i ? { ...x, keep: x.keep.filter((u) => u !== url) } : x))
+    );
+
   const submit = async () => {
+    const hasAnyImage = variants.some((v) => v.keep.length + v.files.length > 0);
+    if (!hasAnyImage) {
+      setMessage('Add at least one image (under any colour).');
+      return;
+    }
     setSaving(true);
     setMessage(null);
     try {
@@ -123,15 +150,17 @@ export default function SellPage() {
       if (form.comparePrice) data.append('comparePrice', form.comparePrice);
       data.append('categoryId', form.categoryId);
       data.append('sizes', form.sizes);
-      data.append('colors', form.colors);
       if (form.brand) data.append('brand', form.brand);
       data.append('condition', form.condition);
       data.append('stock', form.stock);
       data.append('isFeatured', String(form.isFeatured));
-      if (files) Array.from(files).forEach((f) => data.append('images', f));
+
+      // Per-variant payload: meta describes colour + kept URLs; files go under variant_<i>
+      const meta = variants.map((v) => ({ color: v.color.trim(), keep: v.keep }));
+      data.append('variantMeta', JSON.stringify(meta));
+      variants.forEach((v, i) => v.files.forEach((f) => data.append(`variant_${i}`, f)));
 
       if (editingId) {
-        keepImages.forEach((url) => data.append('keepImages', url));
         await api.patch(`/admin/products/${editingId}`, data, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -362,17 +391,6 @@ export default function SellPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-label-md text-on-surface-variant uppercase">
-                    Colors (comma-separated)
-                  </label>
-                  <input
-                    className={underlineInput}
-                    placeholder="Black, Ivory"
-                    value={form.colors}
-                    onChange={(e) => setForm({ ...form, colors: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-1">
                   <label className="text-label-md text-on-surface-variant uppercase">Brand</label>
                   <input
                     className={underlineInput}
@@ -391,49 +409,89 @@ export default function SellPage() {
                   />
                 </div>
 
-                {/* Existing images (edit mode) */}
-                {editingId && keepImages.length > 0 && (
-                  <div className="space-y-2 md:col-span-2">
+                {/* Colour variants — each colour has its own images */}
+                <div className="space-y-4 md:col-span-2">
+                  <div className="flex items-center justify-between">
                     <label className="text-label-md text-on-surface-variant uppercase">
-                      Current images
+                      Colours &amp; images
                     </label>
-                    <div className="flex flex-wrap gap-3">
-                      {keepImages.map((url) => (
-                        <div key={url} className="relative w-20 h-24 group">
-                          <img
-                            src={url}
-                            alt="Product"
-                            onError={onImgError}
-                            className="w-full h-full object-cover border border-outline-variant"
-                          />
+                    <button
+                      type="button"
+                      onClick={addVariant}
+                      className="text-label-md uppercase tracking-wide text-gold-dark hover:text-gold flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">add</span>
+                      Add colour
+                    </button>
+                  </div>
+                  <p className="text-label-md text-on-surface-variant/70 -mt-2">
+                    One row per colour, each with its own images. Leave the colour name blank for a
+                    single-style product. JPG/PNG/WEBP/AVIF · 5MB each.
+                  </p>
+
+                  {variants.map((v, i) => (
+                    <div
+                      key={i}
+                      className="border border-outline-variant p-4 space-y-3 bg-surface-container-low"
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          className={underlineInput}
+                          placeholder="Colour name (e.g. Black) — optional"
+                          value={v.color}
+                          onChange={(e) => setVariantColor(i, e.target.value)}
+                        />
+                        {variants.length > 1 && (
                           <button
                             type="button"
-                            onClick={() => setKeepImages((prev) => prev.filter((u) => u !== url))}
-                            aria-label="Remove image"
-                            className="absolute -top-2 -right-2 bg-brand-red text-white w-5 h-5 rounded-full flex items-center justify-center material-symbols-outlined text-[14px]"
+                            onClick={() => removeVariant(i)}
+                            aria-label="Remove colour"
+                            title="Remove colour"
+                            className="material-symbols-outlined text-[20px] text-on-surface-variant hover:text-brand-red flex-shrink-0"
                           >
-                            close
+                            delete
                           </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                        )}
+                      </div>
 
-                <div className="space-y-1 md:col-span-2">
-                  <label className="text-label-md text-on-surface-variant uppercase">
-                    {editingId ? 'Add more images' : 'Product images'}
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => setFiles(e.target.files)}
-                    className="w-full text-body-sm py-2 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-primary file:text-on-primary file:text-label-md file:uppercase file:cursor-pointer"
-                  />
-                  <p className="text-label-md text-on-surface-variant/70">
-                    JPG, PNG, WEBP or AVIF · up to 6 images · 5MB each
-                  </p>
+                      {/* Kept (existing) images for this colour */}
+                      {v.keep.length > 0 && (
+                        <div className="flex flex-wrap gap-3">
+                          {v.keep.map((url) => (
+                            <div key={url} className="relative w-16 h-20">
+                              <img
+                                src={url}
+                                alt="Product"
+                                onError={onImgError}
+                                className="w-full h-full object-cover border border-outline-variant"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeVariantKeep(i, url)}
+                                aria-label="Remove image"
+                                className="absolute -top-2 -right-2 bg-brand-red text-white w-5 h-5 rounded-full flex items-center justify-center material-symbols-outlined text-[14px]"
+                              >
+                                close
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => setVariantFiles(i, e.target.files)}
+                        className="w-full text-body-sm py-1 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-primary file:text-on-primary file:text-label-md file:uppercase file:cursor-pointer"
+                      />
+                      {v.files.length > 0 && (
+                        <p className="text-label-md text-gold-dark">
+                          {v.files.length} new image{v.files.length === 1 ? '' : 's'} selected
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </div>
 
                 <label className="flex items-center gap-3 md:col-span-2 text-body-sm cursor-pointer">

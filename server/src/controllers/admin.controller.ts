@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { OrderStatus, ProductCondition, Role } from '@prisma/client';
+import { OrderStatus, Prisma, ProductCondition, Role } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
 import { sendEmail, emails } from '../config/resend';
@@ -264,23 +264,80 @@ const uploadImages = async (files?: Express.Multer.File[]) => {
   return results.map((r) => r.url);
 };
 
+const groupFilesByField = (files?: Express.Multer.File[]) => {
+  const map: Record<string, Express.Multer.File[]> = {};
+  for (const f of files ?? []) (map[f.fieldname] ||= []).push(f);
+  return map;
+};
+
+interface Imagery {
+  images: string[];
+  colors: string[];
+  colorImages: Record<string, string[]> | null;
+}
+
+/**
+ * Build the product imagery from the request. Preferred shape is `variantMeta`,
+ * a JSON array `[{ color, keep: [keptUrls] }]` paired with uploaded files named
+ * `variant_<i>`. Each color variant carries its own images; `images` is the
+ * flattened gallery used by cards/cart/fallback. Falls back to the legacy single
+ * `images` file field + `imageUrls`/`keepImages` when no variantMeta is sent.
+ */
+const buildImagery = async (req: Request, fallbackImages: string[] = []): Promise<Imagery> => {
+  const byField = groupFilesByField(req.files as Express.Multer.File[] | undefined);
+
+  if (typeof req.body.variantMeta === 'string' && req.body.variantMeta.trim()) {
+    let meta: { color?: string; keep?: string[] }[];
+    try {
+      meta = JSON.parse(req.body.variantMeta);
+      if (!Array.isArray(meta)) throw new Error('not an array');
+    } catch {
+      throw ApiError.badRequest('Invalid variant data');
+    }
+    const colorImages: Record<string, string[]> = {};
+    const colors: string[] = [];
+    const images: string[] = [];
+    for (let i = 0; i < meta.length; i++) {
+      const uploaded = await uploadImages(byField[`variant_${i}`]);
+      const keep = Array.isArray(meta[i].keep)
+        ? meta[i].keep!.filter((u) => typeof u === 'string')
+        : [];
+      const imgs = [...keep, ...uploaded];
+      if (imgs.length === 0) continue;
+      const name = (meta[i].color ?? '').trim();
+      if (name) {
+        colorImages[name] = imgs;
+        if (!colors.includes(name)) colors.push(name);
+      }
+      images.push(...imgs);
+    }
+    return { images, colors, colorImages: Object.keys(colorImages).length ? colorImages : null };
+  }
+
+  // Legacy fallback: single `images` file field (+ imageUrls / keepImages)
+  const uploaded = await uploadImages(byField['images']);
+  const keep = asStringArray(req.body.keepImages) ?? fallbackImages;
+  const bodyImages = asStringArray(req.body.imageUrls) ?? [];
+  const colors = asStringArray(req.body.colors) ?? [];
+  return { images: [...keep, ...bodyImages, ...uploaded], colors, colorImages: null };
+};
+
 export const createProduct = async (req: Request, res: Response) => {
   const data = productSchema.parse(req.body);
 
   const category = await prisma.category.findUnique({ where: { id: data.categoryId } });
   if (!category) throw ApiError.badRequest('Invalid category');
 
-  const uploaded = await uploadImages(req.files as Express.Multer.File[]);
-  // Allow image URLs in the body too (dev/seed convenience)
-  const bodyImages = asStringArray(req.body.imageUrls) ?? [];
-  const images = [...uploaded, ...bodyImages];
+  const { images, colors, colorImages } = await buildImagery(req);
   if (images.length === 0) throw ApiError.badRequest('At least one product image is required');
 
   const product = await prisma.product.create({
     data: {
       ...data,
+      colors,
       slug: await uniqueProductSlug(data.name),
       images,
+      ...(colorImages ? { colorImages: colorImages as Prisma.InputJsonValue } : {}),
       sellerId: req.user!.userId, // the admin owns the catalog
     },
     include: { category: true },
@@ -299,14 +356,16 @@ export const updateProduct = async (req: Request, res: Response) => {
     if (!category) throw ApiError.badRequest('Invalid category');
   }
 
-  const uploaded = await uploadImages(req.files as Express.Multer.File[]);
-  // `keepImages` is the surviving list after the editor removes some; it replaces the base set.
-  // (Named distinctly from the multer `images` file field to avoid a multipart collision.)
-  const keep = asStringArray(req.body.keepImages);
-  let images: string[] | undefined;
-  if (keep !== undefined || uploaded.length > 0) {
-    images = [...(keep ?? existing.images), ...uploaded];
-    if (images.length === 0) throw ApiError.badRequest('A product must have at least one image');
+  const files = (req.files as Express.Multer.File[] | undefined) ?? [];
+  const touchesImagery =
+    files.length > 0 || req.body.variantMeta || req.body.keepImages || req.body.imageUrls;
+
+  let imagery: Imagery | undefined;
+  if (touchesImagery) {
+    imagery = await buildImagery(req, existing.images);
+    if (imagery.images.length === 0) {
+      throw ApiError.badRequest('A product must have at least one image');
+    }
   }
 
   const product = await prisma.product.update({
@@ -314,7 +373,15 @@ export const updateProduct = async (req: Request, res: Response) => {
     data: {
       ...data,
       ...(data.name ? { slug: await uniqueProductSlug(data.name, existing.id) } : {}),
-      ...(images ? { images } : {}),
+      ...(imagery
+        ? {
+            images: imagery.images,
+            colors: imagery.colors,
+            colorImages: imagery.colorImages
+              ? (imagery.colorImages as Prisma.InputJsonValue)
+              : Prisma.DbNull,
+          }
+        : {}),
     },
     include: { category: true },
   });

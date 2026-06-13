@@ -17,8 +17,9 @@ router.patch('/orders/:id', asyncHandler(admin.updateOrder));
 
 // Catalog authoring
 router.get('/products', asyncHandler(admin.listAllProducts));
-router.post('/products', upload.array('images', 6), asyncHandler(admin.createProduct));
-router.patch('/products/:id', upload.array('images', 6), asyncHandler(admin.updateProduct));
+// upload.any() — product images arrive under per-variant field names (variant_0, …)
+router.post('/products', upload.any(), asyncHandler(admin.createProduct));
+router.patch('/products/:id', upload.any(), asyncHandler(admin.updateProduct));
 router.delete('/products/:id', asyncHandler(admin.deleteProduct));
 
 router.post('/categories', upload.array('image', 1), asyncHandler(admin.createCategory));
