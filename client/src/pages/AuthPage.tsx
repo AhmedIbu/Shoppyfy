@@ -5,9 +5,9 @@ import { clearAuthError, login, register } from '../store/authSlice';
 import { onImgError } from '../utils/imgFallback';
 
 const LOGIN_MODEL =
-  'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=900&q=80';
+  'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=900&q=80';
 const REGISTER_MODEL =
-  'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80';
+  'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=80';
 
 export default function AuthPage() {
   const dispatch = useAppDispatch();
